@@ -1,3 +1,7 @@
+**The easy way to split and manage invoices**
+
+![](https://raw.githubusercontent.com/nextbill-project/server/master/webapp_screenshot.png)
+
 ## NextBill is great for... ##
 
 - **Secure data storage** Store your invoices, receipt images and expense reports securely on your server, NAS or desktop computer
