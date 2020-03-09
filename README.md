@@ -1,4 +1,4 @@
-# NextBill Server-WebApp
+# NextBill Server
 
 **The easy way to split and manage invoices**
 
