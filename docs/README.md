@@ -75,7 +75,7 @@ Schon im Voraus vielen herzlichen Dank für Ihre Unterstützung!
 **Ist NextBill wirklich kostenlos?**
 
 Ja, NextBill ist kostenlos und vollständig OpenSource. Entsprechend den Grundsätzen werden auch zu keinem Zeitpunkt persönliche Daten erhoben oder weitergegeben. Alle Ihre eingegebenen Daten werden ausschließlich in Ihrer eigenen NextBill-Datenbank und allen mit Ihrer NextBill-Instanz verbundenen Android-Apps gespeichert.
-Es ist allerdings in Zukunft geplant eine kostenpflichte Zusatzfunktion anzubieten, die es erlaubt Quittungen automatisch analysieren bzw. auslesen zu lassen. Diese Funktion wird optional sein und Kosten werden ausschließlich, selbstverständlich vollständig transparent, bei aktiver Inanspruchnahme dieser Leistung entstehen. Nähere Infos auf https://scansio.de.
+Es ist allerdings in Zukunft geplant eine kostenpflichte Zusatzfunktion anzubieten, die es erlaubt Quittungen automatisch analysieren bzw. auslesen zu lassen. Diese Funktion wird optional sein und Kosten werden ausschließlich, selbstverständlich vollständig transparent, bei aktiver Inanspruchnahme dieser Leistung entstehen. Nähere Infos auf [scansio.de](https://scansio.de).
 
 **Was ist ein Zahlungsempfänger, ein Geldgeber und was ein Kostenträger?**
 
