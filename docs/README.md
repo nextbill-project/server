@@ -1,6 +1,10 @@
-**Das OpenSource-Projekt NextBill hilft Ihnen bei der Kostenaufteilung mit dem Partner, WG-Mitbewohnern und Freunden. Unterstützt durch intelligente Funktionen, durchdachtem Workflow und einer Android-App, wird die Kostenaufstellung zum Kinderspiel. Und das alles kostenlos und auf Ihrem eigenen Server, NAS oder Desktop-System.**
+**Das OpenSource-Projekt NextBill hilft Ihnen bei der Kostenaufteilung mit dem Partner, WG-Mitbewohnern und Freunden.**
 
 ![](https://raw.githubusercontent.com/nextbill-project/server/master/docs/assets/top_devices.png)
+
+**Unterstützt durch intelligente Funktionen, durchdachtem Workflow und einer Android-App, wird die Kostenaufstellung zum Kinderspiel. Und das alles kostenlos und auf Ihrem eigenen Server, NAS oder Desktop-System. Nachfolgend finden Sie alle wichtigen Informationen zum Projekt. Gehen Sie bitte bei Fragen oder Anregungen zunächst den unter [Support](#support) beschriebenen Guideline durch.**
+
+---
 
 # Übersicht
 
@@ -11,6 +15,8 @@
 - [Spenden & Unterstützung](#spenden--unterstützung)
 - [Umfrage](#umfrage)
 - [FAQ](#faq)
+
+---
 
 ## Features ##
 
