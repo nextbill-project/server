@@ -24,9 +24,9 @@ Regarding access, two scenarios can be distinguished:
 2. You install NextBill on a (cloud) server. In this case you can access it from anywhere via browser or the Android app. But keep in mind that such a configuration tends to have higher security risks.
 
 ## Quick-Setup
-1. Install version 1.8 of Java Runtime Environment [Download](https://www.oracle.com/java/technologies/javase-jre8-downloads.html)
-2. Download the 'NextBill.jar' and copy it to a folder of your choice.
-3. **On Windows or Mac** double click on the Jar
+1. Download the 'NextBill.jar' from the Release-Page and copy it to a folder of your choice.
+2. Install version 1.8 of Java Runtime Environment [Download](https://www.oracle.com/java/technologies/javase-jre8-downloads.html)
+3. **On Windows or Mac** double click on the Jar.
 **On Linux or without display screen** open a terminal and enter:
 ```
 cd 'path/to/your/jar'
@@ -36,7 +36,7 @@ java -jar nextbill.jar
 
 You should run NextBill on every system startup for easy access. You will soon find more details in the Wiki.
 
-##Contribution
+## Contribution
 
 You want to contribute? That's great! Please use the following steps and your changes will be visible very soon!
 
