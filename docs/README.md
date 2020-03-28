@@ -31,21 +31,23 @@ Hinsichtlich des Zugriffs lassen sich im wesentlichen zwei Szenarien unterscheid
 2. Sie installieren NextBill auf einem (Cloud-) Server. In diesem Fall können Sie von überall aus über einen Browser oder die Android-App zugreifen. Bedenken Sie aber, dass eine solche Konfiguration tendenziell höhere Sicherheitsrisiken birgt.
 
 ### Download
-Bitte laden Sie die aktuelle Version der NextBill-Server Instanz von der Release-Seite auf GitHub herunter:
+Bitte laden Sie die aktuelle Version der NextBill-Server Instanz von der Release-Seite auf GitHub herunter  und kopieren Sie sie in einen Ordner Ihrer Wahl.
 
 **[Zur Release-Seite](https://github.com/nextbill-project/server/releases){:target="_blank"}**
 
 ### Setup auf dem System
 1. Version 1.8 der Java-Laufzeitumgebung installieren [Download](https://www.oracle.com/java/technologies/javase-jre8-downloads.html){:target="_blank"}
-2. Laden Sie über die GitHub-Releases Seite die aktuelle Version der jar herunter und kopieren Sie sie in einen Ordner Ihrer Wahl.
-3. **Unter Windows oder Mac** Doppelklicken Sie auf die heruntergeladene Jar, warten Sie 10 Sekunden
+2. Führen Sie die aus dem vorherigen Abschnitt ("Download") heruntergeladene Jar aus.
+
+**Unter Windows oder Mac** Doppelklicken Sie auf die heruntergeladene Jar, warten Sie 10 Sekunden
+
 **Unter Linux oder ohne Bildschirm** Öffnen Sie ein Terminal und geben Sie ein:
 ```
 cd 'Pfad/zur/jar'
 java -jar nextbill.jar
 ```
-4. Öffnen Sie danach einen Browser mit der URL [http://localhost:8010](http://localhost:8010) und folgen Sie dem Setup.
-5. Laden Sie bei Bedarf die Android-App aus dem Play Store und hinterlegen Sie dort die IP des Server-Systems.
+3. Öffnen Sie danach einen Browser mit der URL [http://localhost:8010](http://localhost:8010) und folgen Sie dem Setup.
+4. Laden Sie bei Bedarf die Android-App aus dem Play Store und hinterlegen Sie dort die IP des Server-Systems.
 
 Sie können NextBill auch bei jedem Systemstart ausführen. Weitere Details dazu finden Sie bald im Wiki.
 
@@ -88,7 +90,7 @@ Nehmen Sie auch gerne an der Umfrage teil, damit NextBill bei der Entwicklung no
 Ja, NextBill ist kostenlos und vollständig OpenSource. Entsprechend den Grundsätzen werden auch zu keinem Zeitpunkt persönliche Daten erhoben oder weitergegeben. Alle Ihre eingegebenen Daten werden ausschließlich in Ihrer eigenen NextBill-Datenbank und allen mit Ihrer NextBill-Instanz verbundenen Android-Apps gespeichert.
 Es ist allerdings in Zukunft geplant eine kostenpflichte Zusatzfunktion anzubieten, die es erlaubt Quittungen automatisch analysieren bzw. auslesen zu lassen. Diese Funktion wird optional sein und Kosten werden ausschließlich, selbstverständlich vollständig transparent, bei aktiver Inanspruchnahme dieser Leistung entstehen. Nähere Infos auf [scansio.de](https://scansio.de){:target="_blank"}.
 
-**Warum  kann sich die App nicht synchronisieren?**
+**Warum  kann sich die Android App nicht synchronisieren oder zeigt seltsame Fehler?**
 
 Vermutlich sind Ihre App-Version und die Server-Version nicht (mehr) kompatibel. Auch wenn dies versucht wird zu verhindern - geplant ist zukünftig bei Inkompatibilität automatisiert darauf hinzuweisen - so kann dies in Ausnahmefällen nach einem Release passieren. Bitte aktualisieren Sie zur Problembehebung Ihre App über den PlayStore und Ihre NextBill Server Instanz, indem Sie einfach die alte Jar-Datei mit der neuesten Version ersetzen.
 
