@@ -30,10 +30,15 @@ Hinsichtlich des Zugriffs lassen sich im wesentlichen zwei Szenarien unterscheid
 
 2. Sie installieren NextBill auf einem (Cloud-) Server. In diesem Fall können Sie von überall aus über einen Browser oder die Android-App zugreifen. Bedenken Sie aber, dass eine solche Konfiguration tendenziell höhere Sicherheitsrisiken birgt.
 
+### Download
+Bitte laden Sie die aktuelle Version der NextBill-Server Instanz von der Release-Seite auf GitHub herunter:
+
+**[Zur Release-Seite](https://github.com/nextbill-project/server/releases){:target="_blank"}**
+
 ### Setup auf dem System
-1. Version 1.8 der Java-Laufzeitumgebung installieren [Download](https://www.oracle.com/java/technologies/javase-jre8-downloads.html)
+1. Version 1.8 der Java-Laufzeitumgebung installieren [Download](https://www.oracle.com/java/technologies/javase-jre8-downloads.html){:target="_blank"}
 2. Laden Sie über die GitHub-Releases Seite die aktuelle Version der jar herunter und kopieren Sie sie in einen Ordner Ihrer Wahl.
-3. **Unter Windows oder Mac** Doppelklicken Sie auf die Jar, warten Sie 10 Sekunden
+3. **Unter Windows oder Mac** Doppelklicken Sie auf die heruntergeladene Jar, warten Sie 10 Sekunden
 **Unter Linux oder ohne Bildschirm** Öffnen Sie ein Terminal und geben Sie ein:
 ```
 cd 'Pfad/zur/jar'
@@ -46,7 +51,7 @@ Sie können NextBill auch bei jedem Systemstart ausführen. Weitere Details dazu
 
 ## Entstehung
 
-Gestartet 2016 als privates Projekt, begann NextBill schnell an Funktionsumfang weit über den privaten Bedarf hinaus zuzunehmen. Fokus war-  damals wie heute - neben der Grundfunktion des komfortablen Kosten aufteilens zwischen Partnern, WG-Mitgliedern oder Freunden, lästige Eingaben durch intelligente Helfer zu vereinfachen und dabei dennoch hohen Datenschutz-Ansprüchen gerecht zu werden. Insbesondere aufgrund des zweiten Aspekts stand früh fest, dass sich eine sichere Cloud-Lösung - bestehend aus Server-Anwendung, Web-App und Android-App - nur über eine Self-Hosted-Infrastruktur lösen lässt. Seit 2019 wird intensiv daran gearbeitet die Installation und Nutzung auch für technisch unerfahrene Nutzer zugänglicher zu machen. 
+Gestartet 2016 als privates Projekt, begann NextBill schnell an Funktionsumfang weit über den persönlichen Bedarf hinaus zuzunehmen. Fokus war-  damals wie heute - neben der Grundfunktion des komfortablen Kosten aufteilens zwischen Partnern, WG-Mitgliedern oder Freunden, lästige Eingaben durch intelligente Helfer zu vereinfachen und dabei dennoch hohen Datenschutz-Ansprüchen gerecht zu werden. Insbesondere aufgrund des zweiten Aspekts stand früh fest, dass sich eine sichere Cloud-Lösung - bestehend aus Server-Anwendung, Web-App und Android-App - nur über eine Self-Hosted-Infrastruktur lösen lässt. Seit 2019 wird intensiv daran gearbeitet die Installation und Nutzung auch für technisch unerfahrene Nutzer zugänglicher zu machen. 
 
 Im Frühling 2020 wurde NextBill auf GitHub unter der AGPL v3 Lizenz veröffentlicht und profitiert somit in Zukunft von einer aktiven Community, kurzfristigem Feedback und schneller Identifizierung von Sicherheitslücken.
 
@@ -58,24 +63,38 @@ Sie haben Fragen oder einen Fehler gefunden? Dann orientieren Sie sich bitte an 
 2. Konsultieren Sie das FAQ auf dieser Seite. Viele Fragen können dort schon beantwortet werden, außerdem werden stetig Antworten ergänzt.
 3. Durchstöbern Sie die Liste der bereits gefundenen Issues auf der Github-Seite. Eventuell wurde der Fehler ja bereits erfasst und befindet sich schon auf der Roadmap.
 4. Schreiben Sie ein neues Issue, bitte orientieren Sie sich dabei am zur Verfügung gestellten Template. 
-5. Falls Sie glauben, dass es sich um eine sehr spezielle Frage handelt, schreiben Sie bitte eine E-Mail an: scansio@gmx.de. Bedenken Sie, dass eine Antwort mehrere Wochen dauern kann.
+5. Falls Sie glauben, dass es sich um eine sehr spezielle Frage handelt, schreiben Sie bitte eine E-Mail an: fragen@nextbill.de. Bedenken Sie, dass eine Antwort mehrere Wochen dauern kann.
 
-## Spenden
+##  Spenden & Unterstützung
 
-In die Entwicklung von NextBill ist viel (Frei-) Zeit geflossen. Rechnerisch wurde sich schon jetzt über 1000 Stunden durchgehend mit dem Projekt beschäftigt.
-Keiner sollte sich nun verpflichtet fühlen dafür eine Gegenleistung zu erbringen. NextBill ist und bleibt kostenlos und OpenSource. Das impliziert auch, dass die größte Würdigung der Leistung darin liegt, dass das Projekt (aktiv) genutzt wird und alle Wünsche zufriedenstellend erfüllt worden sind.
-Dennoch ist jede Spende willkommen - nicht nur als Anerkennung des Gesamtwerks, sondern auch als Motivation NextBill weiterhin voran zu treiben und zu einem nachhaltigen Projekt auszubauen.
+In die Entwicklung von NextBill ist viel (Frei-) Zeit geflossen. Rechnerisch wurden schon jetzt alleine vom Gründer über 1000 Arbeitsstunden in das Projekt investiert.
+Keiner sollte sich nun verpflichtet fühlen dafür eine Gegenleistung zu erbringen. NextBill ist und bleibt kostenlos und basiert auf der Idee von OpenSource. Das impliziert auch, dass die größte Würdigung der Leistung darin liegt, dass das Projekt (aktiv) genutzt wird und die meisten Wünsche zufriedenstellend erfüllt worden sind.
+Dennoch ist jede Spende und Unterstützung (in Form eines Beitrags oder einer Idee) willkommen - nicht nur als Anerkennung des Gesamtwerks, sondern auch als Motivation NextBill weiterhin voran zu treiben und zu einem nachhaltigen Projekt auszubauen.
 
 Spenden können gerne über die PayPal.me-Adresse des Gründers getätigt werden:
-[paypal.me/MichasKonto](https://www.paypal.com/paypalme2/MichasKonto)
+[paypal.me/MichasKonto](https://www.paypal.com/paypalme2/MichasKonto){:target="_blank"}
 Schon im Voraus vielen herzlichen Dank für Ihre Unterstützung!
+
+## Umfrage
+
+Nehmen Sie auch gerne an der Umfrage teil, damit NextBill bei der Entwicklung noch besser auf die konkreten Wünsche und Anforderungen der Nutzer eingehen kann.
+
+**[Zur Umfrage](https://forms.gle/X5dpFNnH1Rv8VWLU8){:target="_blank"}**
 
 ## FAQ
 
 **Ist NextBill wirklich kostenlos?**
 
 Ja, NextBill ist kostenlos und vollständig OpenSource. Entsprechend den Grundsätzen werden auch zu keinem Zeitpunkt persönliche Daten erhoben oder weitergegeben. Alle Ihre eingegebenen Daten werden ausschließlich in Ihrer eigenen NextBill-Datenbank und allen mit Ihrer NextBill-Instanz verbundenen Android-Apps gespeichert.
-Es ist allerdings in Zukunft geplant eine kostenpflichte Zusatzfunktion anzubieten, die es erlaubt Quittungen automatisch analysieren bzw. auslesen zu lassen. Diese Funktion wird optional sein und Kosten werden ausschließlich, selbstverständlich vollständig transparent, bei aktiver Inanspruchnahme dieser Leistung entstehen. Nähere Infos auf [scansio.de](https://scansio.de).
+Es ist allerdings in Zukunft geplant eine kostenpflichte Zusatzfunktion anzubieten, die es erlaubt Quittungen automatisch analysieren bzw. auslesen zu lassen. Diese Funktion wird optional sein und Kosten werden ausschließlich, selbstverständlich vollständig transparent, bei aktiver Inanspruchnahme dieser Leistung entstehen. Nähere Infos auf [scansio.de](https://scansio.de){:target="_blank"}.
+
+**Warum  kann sich die App nicht synchronisieren?**
+
+Vermutlich sind Ihre App-Version und die Server-Version nicht (mehr) kompatibel. Auch wenn dies versucht wird zu verhindern - geplant ist zukünftig bei Inkompatibilität automatisiert darauf hinzuweisen - so kann dies in Ausnahmefällen nach einem Release passieren. Bitte aktualisieren Sie zur Problembehebung Ihre App über den PlayStore und Ihre NextBill Server Instanz, indem Sie einfach die alte Jar-Datei mit der neuesten Version ersetzen.
+
+**Wieso unterscheidet sich der Funktionsumfang zwischen der Web-Applikation und der Android App?**
+
+Generell werden Funktionen immer in die Web-Applikation eingebaut und erst dann wird entschieden, ob sie auch in der Android App verfügbar sein soll. Der Grund dafür ist schlichtweg, dass die native Android Entwicklung deutlich aufwendiger ist als die Web-Entwicklung und daher nicht alle Funktionen auf beiden Plattformen angeboten werden können.
 
 **Was ist ein Zahlungsempfänger, ein Geldgeber und was ein Kostenträger?**
 
@@ -110,4 +129,4 @@ Die Berechnung dieses Wertes findet immer nur einmal nachts statt. Entweder lief
 
 **Gibt es auch eine Quittungs-Analyse, die automatisch Summe, Geschäft usw. ermittelt?**
 
-Jaein, aber es befindet sich eine in der Alpha-Phase! Auch hierbei handelt es sich um eine Eigenentwicklung mit den gleich hohen Anforderungen an den Datenschutz wie bei NextBill. Das Produkt wird den Namen "Scansio" tragen und kostenpflichtig sein, aber zu einem fairen Preis angeboten werden. Näheres wird verkündet, sobald die Alpha-Phase beendet ist.
+Jaein, aber es befindet sich eine in der Beta-Phase! Auch hierbei handelt es sich um eine Eigenentwicklung mit den gleich hohen Anforderungen an den Datenschutz wie bei NextBill. Das Produkt wird den Namen "Scansio" tragen und kostenpflichtig sein, aber zu einem fairen Preis angeboten werden. Näheres wird verkündet, sobald die Alpha-Phase beendet ist.
