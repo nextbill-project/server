@@ -2,7 +2,17 @@
 
 ![](https://raw.githubusercontent.com/nextbill-project/server/master/docs/assets/top_devices.png)
 
-## Argumente gefällig? ##
+# Übersicht
+
+- [Features](#features)
+- [Installation](#installation)
+- [Entstehung](#entstehung)
+- [Support](#support)
+- [Spenden & Unterstützung](#spenden--unterstützung)
+- [Umfrage](#umfrage)
+- [FAQ](#faq)
+
+## Features ##
 
 **Sichere Datenspeicherung** Speichern Sie Ihre Rechnungen, Quittungsbilder und Kostenabrechnungen sicher auf Ihrem Server, NAS oder Desktop-Computer
 
@@ -19,7 +29,6 @@
 **Datenanalyse** Analysieren Sie Ihre Daten anhand von Diagrammen und Schlüsselwerten oder sehen Sie sich Prognosen an
 
 **Benutzerverwaltung** Verwalten Sie die Benutzer und geben Sie ihnen ganz nach Bedarf unterschiedliche Rechte
-
 
 ## Installation
 ### Einrichtung der Umgebung
