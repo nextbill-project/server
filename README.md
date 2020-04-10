@@ -6,14 +6,15 @@
 
 ## NextBill is great for... ##
 
-- **Secure data storage** Store your invoices, receipt images and expense reports securely on your server, NAS or desktop computer
+- **Secure Data Storage** Store your invoices, receipt images and expense reports securely on your server, NAS or desktop computer
 - **Anytime Data Access** You can access your data anytime and from anywhere via Android (even offline) and web app
-- **Intelligent input assistants** Automatic completion as well as e-mail reception, image upload and voice input support you during data input
+- **Intelligent Input Assistants** Automatic completion as well as e-mail reception, image upload and voice input support you during data input
 - **Split Invoices** Split bills and create expense reports for your partner, roommate or friend
 - **Billing Workflow** Always keep track of open invoices and the workflow of cost settlements
-- **Define cost limits** Create budgets and be automatically warned when they are exceeded
-- **Data analysis** Evaluate your data using a series of charts and key values or look at forecasts
-- **User administration** Manage users and give them different rights, depending on your needs
+- **Define Cost Limits** Create budgets and be automatically warned when they are exceeded
+- **Data Analysis** Evaluate your data using a series of charts and key values or look at forecasts
+- **User Administration** Manage users and give them different rights, depending on your needs
+- **Automatic Receipt Recognition** Invoices can be filled out automatically via image, voice and e-mail recognition (external service with costs, see FAQ)
 
 ## Installation
 The Java architecture allows NextBill to be installed on almost any system. 
@@ -58,12 +59,13 @@ All contributions to this repository are considered to be licensed under the AGP
 - [Jaspersoft Studio 6.11.0](https://community.jaspersoft.com/project/jaspersoft-studio/releases) (optional)
 
 
-### Used technologies
+### Used technologies and libraries
 
-- Spring Boot 2.2.2
+- Spring Boot 2.2
 - Java 1.8
 - OAuth 2
-- Angular JS 1.5.8
+- Angular JS 1.5
+- Bootstrap 4.3
 
 An executable Jar can be built with:
 ```
