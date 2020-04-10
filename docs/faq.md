@@ -47,4 +47,4 @@ Die Berechnung dieses Wertes findet immer nur einmal nachts statt. Entweder lief
 
 **Gibt es auch eine Quittungs-Erfassung, die automatisch Summe, Geschäft usw. ermittelt?**
 
-Jaein, aber es befindet sich eine in der Beta-Phase! Hierbei handelt es sich um eine Eigenentwicklung des initialen Entwicklers von NextBill, Michael Roedel, mit den gleich hohen Anforderungen an den Datenschutz wie bei NextBill. Der externe Service heißt "Scansio" und wird kostenpflichtig sein. Näheres auf [scansio.de](https://scansio.de){:target="_blank"}. Die Veröffentlichung wird zeitnah hier und natürlich auf der Scansio-Homepage bekannt gegeben.
+Jaein, aber es befindet sich eine in der Beta-Phase! Hierbei handelt es sich um eine Eigenentwicklung des initialen Entwicklers von NextBill mit den gleich hohen Anforderungen an den Datenschutz wie bei NextBill. Der externe Service heißt "Scansio" und wird kostenpflichtig sein. Näheres auf [scansio.de](https://scansio.de){:target="_blank"}. Die Veröffentlichung wird zeitnah hier und natürlich auf der Scansio-Homepage bekannt gegeben.
