@@ -58,7 +58,7 @@ public class VersionService {
 
     public String requestCurrentVersionOnGitHub() throws ParserConfigurationException, IOException, SAXException {
 
-        URI uriPomOfCurrentVersion = UriComponentsBuilder.fromHttpUrl("http://www.mocky.io/v2/5e68e6c62f000085cad8b0b6")
+        URI uriPomOfCurrentVersion = UriComponentsBuilder.fromHttpUrl("https://raw.githubusercontent.com/nextbill-project/server/master/pom.xml")
                 .build().encode().toUri();
 
         String xmlResponse = new RestTemplate().getForObject(uriPomOfCurrentVersion, String.class);
