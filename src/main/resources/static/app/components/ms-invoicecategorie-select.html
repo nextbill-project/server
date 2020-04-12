@@ -1,0 +1,107 @@
+<!--
+  ~ NextBill server application
+  ~
+  ~ @author Michael Roedel
+  ~ Copyright (c) 2020 Michael Roedel
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div>
+    <div ng-if="vm.disabled">
+        <div ng-if="vm.currentSelection">
+            {{vm.currentSelection.invoiceCategoryName}}
+        </div>
+        <div ng-if="vm.currentSelection == null || vm.currentSelection == undefined">
+            Keine Auswahl
+        </div>
+    </div>
+    <div ng-if="!vm.disabled">
+        <div ng-if="vm.currentSelection">
+            <a href data-toggle="modal" data-target="{{vm.getDialogId()}}" ng-click="vm.showDialog = true">{{vm.currentSelection.invoiceCategoryName}}</a>
+            <a href ng-click="vm.selectNone()" class="details-view__menu-item"><i class="fa fa-times-circle"></i></a>
+        </div>
+        <div ng-if="(vm.currentSelection == null || vm.currentSelection == undefined)  && vm.hideSelectionButton == undefined">
+            <a href data-toggle="modal" data-target="{{vm.getDialogId()}}" ng-click="vm.showDialog = true">
+                Auswählen
+            </a>
+        </div>
+    </div>
+</div>
+
+<div id="{{vm.getDialogIdWithoutHash()}}" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content" ng-if="(vm.hideSelectionButton != undefined && vm.hiddenSelButtonActivator) || (vm.hideSelectionButton == undefined && vm.showDialog)">
+            <div class="modal-header">
+                <h4 class="modal-title">Kategorie auswählen</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <p>
+                        <strong>Suche:</strong> <input type="text" class="search__input form-control w-75"
+                                                       placeholder="Restaurantbesuch, Benzin…"
+                                                       ng-model="vm.invoiceCategorySearch" ng-change="vm.refreshInvoiceParents()"/>
+
+                        <div ng-repeat="parentInvoiceCategory in vm.getParentInvoiceCategories() | orderBy:'invoiceCategoryName'">
+                            <h5>{{parentInvoiceCategory.invoiceCategoryName}} <a href ng-click="vm.parentInvoiceCategoryAdding[parentInvoiceCategory.invoiceCategoryId] = true" class="fa fa-plus-circle text-black-50"></a></h5>
+                            <div ng-if ="vm.parentInvoiceCategoryAdding[parentInvoiceCategory.invoiceCategoryId] == true">
+                                <div class="row my-3">
+                                    <div class="col-12">
+                                        <div class="bg-secondary p-3 rounded">
+                                            <h5>Kategorie hinzufügen</h5>
+                                            <div class="row">
+                                                <div class="col-1 pull-left">
+                                                    <div class="pull-left">
+                                                        <h4><a href class="fa fa-times-circle text-black-50" ng-click="vm.parentInvoiceCategoryAdding[parentInvoiceCategory.invoiceCategoryId] = false"></a></h4>
+                                                    </div>
+                                                </div>
+                                                <div class="col-9 text-center">
+                                                    <div class="row">
+                                                        <div class="col-2">
+                                                            <span>Name:</span>
+                                                        </div>
+                                                        <div class="col-10">
+                                                            <input type="text" class="form-control d-inline w-100 p-1" ng-model="vm.newInvoiceCategoryName"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-1 float-right pl-0">
+                                                    <div class="float-right">
+                                                        <h4><a href class="fa fa-plus-circle text-black-50" ng-click="vm.createInvoiceCategory(parentInvoiceCategory);"></a></h4>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <table class="table table-hover" cellspacing="0" cellpadding="0">
+                                <tbody>
+                                <tr ng-repeat="invoiceCategory in vm.findInvoiceCategoriesForParent(parentInvoiceCategory) | filter: vm.searchFilterForInvoiceCategories() | orderBy:'invoiceCategoryName'">
+                                    <td>
+                                        <a href ng-click="vm.selectInvoiceCategory(invoiceCategory)" data-dismiss="modal">{{invoiceCategory.invoiceCategoryName}}</a>
+                                    </td>
+                                    <td><a href ng-click="vm.removeInvoiceCategory(invoiceCategory)" ng-if="invoiceCategory.canBeDeleted" class="float-right"><span class="fas fa-trash"></span></a></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

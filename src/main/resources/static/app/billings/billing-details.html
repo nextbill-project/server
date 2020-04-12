@@ -1,0 +1,184 @@
+<!--
+  ~ NextBill server application
+  ~
+  ~ @author Michael Roedel
+  ~ Copyright (c) 2020 Michael Roedel
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div class="content">
+    <header>
+        <h2 class="header__title">
+            <a role="button" ui-sref="billings.processList"><i class="fa fa-arrow-circle-left"></i></a>
+            Abrechnungsdetails
+        </h2>
+    </header>
+    <main>
+        <div ng-if="vm.billingServiceLoading()" class="mx-auto mt-5">
+            <div class="loader loader__small"></div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-xl-4 col-12">
+                <div class="row" ng-if="vm.billing && !vm.billingServiceLoading()">
+                    <div class="col-12">
+                        <div class="p-3 mb-3 rounded billing-details__info__bg-color">
+                            <h3 class="mb-3 mt-0">Informationen</h3>
+                            <div class="row mb-3">
+                                <div class="col-12 text-center" ng-if="vm.billing.isNormalPayment">
+                                    <span>
+                                        <h3 class="d-inline-block">{{vm.billing.costPayerDTO.paymentPersonName}}</h3>
+                                        <i class="fa fa-arrow-right mx-3"></i>
+                                        <h3 class="d-inline-block">{{vm.billing.invoicePayerDTO.paymentPersonName}}</h3>
+                                    </span>
+                                </div>
+                                <div class="col-12 text-center" ng-if="!vm.billing.isNormalPayment">
+                                    <span>
+                                        <h3 class="d-inline-block">{{vm.billing.invoicePayerDTO.paymentPersonName}}</h3>
+                                        <i class="fa fa-arrow-right mx-3"></i>
+                                        <h3 class="d-inline-block">{{vm.billing.costPayerDTO.paymentPersonName}}</h3>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <table class="table table-hover">
+                                        <tbody>
+                                            <tr>
+                                                <td>Status:</td>
+                                                <td>{{vm.billing.subject}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Erstellt:</td>
+                                                <td>{{vm.billing.createdDate | date: 'dd. MMMM yyyy'}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Gesamt:</td>
+                                                <td >{{vm.billing.sumToPay | number}} € <i class="fa fa-exclamation-triangle text-danger" ng-if="vm.billing.sumToPay < 0"></i></td>
+                                            </tr>
+                                            <tr >
+                                                <td>Bezahlt:</td>
+                                                <td><span ng-if="vm.billing.messageType === 'TO_PAY' || vm.billing.messageType === 'PAID_AND_WAIT' || vm.billing.messageType === 'PAID'">( {{vm.returnSumPaidSum() | number}} ) €</span>
+                                                    <span ng-if="!(vm.billing.messageType === 'TO_PAY' || vm.billing.messageType === 'PAID_AND_WAIT' || vm.billing.messageType === 'PAID')">{{vm.returnSumPaidSum() | number}} €</span>
+                                                    <span class="fa fa-hourglass-half" ng-if="vm.billing.messageType === 'PAID_AND_WAIT' || vm.billing.messageType === 'PAID'"></span>
+                                                    <div ng-if="vm.billing.sumToPay !== vm.billing.sumPaid">
+                                                        <div ng-if="vm.billing.compensationPossible">
+                                                            <a href class="btn btn-link text-left" ng-click="vm.createCompensation()"><i class="fa fa-exchange"></i> Nachzahlung/<br/>Erstattung erstellen</a>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>PDF-Rechnung:</td>
+                                                <td><a ng-href="{{vm.getBillingReportUrl()}}">Download</a></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-3 mb-3 rounded billing-details__danger-hint-sum__bg-color" ng-if="vm.billing.sumToPay !== vm.billing.sumPaid">
+                            <div class="row">
+                                <div class="col-12">
+                                    <h3 class="mb-3 mt-0">Achtung</h3>
+                                    <div class="px-4">
+                                        Der Gesamtbetrag wurde noch nicht vollständig beglichen oder hat sich geändert.
+                                        <span ng-if="vm.billing.compensationPossible">
+                                            <br/><br/>
+                                            <b>Bitte den Betrag ausgleichen!</b>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-3 mb-3 rounded billing-details__actions__bg-color">
+                            <div class="row">
+                                <div class="col-12">
+                                    <h3 class="mb-3 mt-0">Aktionen</h3>
+                                    <div class="px-5">
+                                        <div class="row" ng-if="vm.billing.messageType === 'TO_PAY' || vm.billing.messageType === 'PAID' || vm.billing.messageType === 'PAYMENT_CONFIRMED' || vm.billing.messageType === 'WAIT_FOR_PAYMENT'">
+                                            <div class="col-12">
+                                                <span class="btn btn-primary w-100" ng-if="vm.billing.messageType === 'TO_PAY'" ng-click="vm.firstAction()">Zahlung ausgeführt</span>
+                                                <span class="btn btn-primary w-100" ng-if="vm.billing.messageType === 'PAID'" ng-click="vm.firstAction()">Zahlung erhalten</span>
+                                                <span class="btn btn-primary w-100" ng-if="vm.billing.messageType === 'WAIT_FOR_PAYMENT'" ng-click="vm.firstAction()">Zahlung erhalten</span>
+                                                <span class="btn btn-primary w-100" ng-if="vm.billing.messageType === 'PAYMENT_CONFIRMED'" ng-click="vm.firstAction()">Abrechnung abschließen</span>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-3" ng-if="vm.billing.messageType === 'TO_PAY' || vm.billing.messageType === 'WAIT_FOR_PAYMENT' || vm.billing.sumToPay === 0">
+                                            <div class="col-12">
+                                                <span class="btn btn-danger w-100" ng-click="vm.secondAction()">Stornieren</span>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-3" ng-if="vm.billing.messageType === 'PAYMENT_CONFIRMED' || vm.billing.messageType === 'FINISHED' || vm.billing.messageType === 'ARCHIVED'">
+                                            <div class="col-12">
+                                                <span class="btn btn-primary w-100" ng-if="vm.billing.messageType !== 'ARCHIVED'" ng-click="vm.archiveBilling()">Archivieren</span>
+                                                <span class="btn btn-danger w-100" ng-if="vm.billing.messageType === 'ARCHIVED'" ng-click="vm.secondAction()">Löschen</span>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-3" ng-if="vm.billing.messageType === 'TO_PAY' && vm.billing.paypalMeUrl">
+                                            <div class="col-12 text-center">
+                                                <h5><a role="button" ng-href="{{vm.billing.paypalMeUrl}}" target="_blank"><i class="fab fa-paypal"></i> Mit PayPal.me bezahlen</a></h5>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-8 col-12" ng-if="!vm.billingServiceLoading()">
+                <div class="row mb-3">
+                    <div class="col-12 text-center">
+                        <div ng-if="vm.billing.isNormalPayment">
+                            <h3>
+                                <span>{{vm.billing.costPayerDTO.paymentPersonName}}</span>
+                                <i class="fa fa-arrow-right mx-3" ng-if="!vm.switched" ng-click="vm.toggleSwitch()"></i>
+                                <i class="fa fa-arrow-left mx-3" ng-if="vm.switched" ng-click="vm.toggleSwitch()"></i>
+                                <span>{{vm.billing.invoicePayerDTO.paymentPersonName}}</span>
+                            </h3>
+                        </div>
+                        <div ng-if="!vm.billing.isNormalPayment">
+                            <h3>
+                                <span>{{vm.billing.invoicePayerDTO.paymentPersonName}}</span>
+                                <i class="fa fa-arrow-right mx-3" ng-if="!vm.switched" ng-click="vm.toggleSwitch()"></i>
+                                <i class="fa fa-arrow-left mx-3" ng-if="vm.switched" ng-click="vm.toggleSwitch()"></i>
+                                <span>{{vm.billing.costPayerDTO.paymentPersonName}}</span>
+                            </h3>
+                        </div>
+                        <h8>
+                            (Bitte auf den Pfeil klicken, um Perspektive zu wechseln!)
+                        </h8>
+                    </div>
+                </div>
+                <div class="row" ng-if="!vm.billing.isNormalPayment">
+                    <div class="col-12" ng-if="vm.switched">
+                        <ms-invoice-table ms-invoices="vm.billing.invoicesForInvoicePayer" ms-selected="vm.selected" ms-use-selection="false" ms-read-only="true" ms-use-debt="true" ms-return-view="vm.returnViewObject"></ms-invoice-table>
+                    </div>
+                    <div class="col-12" ng-if="!vm.switched">
+                        <ms-invoice-table ms-invoices="vm.billing.invoicesForCostPayer" ms-selected="vm.selected" ms-use-selection="false" ms-read-only="true" ms-use-debt="true" ms-return-view="vm.returnViewObject"></ms-invoice-table>
+                    </div>
+                </div>
+                <div class="row" ng-if="vm.billing.isNormalPayment">
+                    <div class="col-12" ng-if="vm.switched">
+                        <ms-invoice-table ms-invoices="vm.billing.invoicesForCostPayer" ms-selected="vm.selected" ms-use-selection="false" ms-read-only="true" ms-use-debt="true" ms-return-view="vm.returnViewObject"></ms-invoice-table>
+                    </div>
+                    <div class="col-12" ng-if="!vm.switched">
+                        <ms-invoice-table ms-invoices="vm.billing.invoicesForInvoicePayer" ms-selected="vm.selected" ms-use-selection="false" ms-read-only="true" ms-use-debt="true" ms-return-view="vm.returnViewObject"></ms-invoice-table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>

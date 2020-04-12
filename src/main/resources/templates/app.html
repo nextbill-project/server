@@ -1,0 +1,394 @@
+<!--
+  ~ NextBill server application
+  ~
+  ~ @author Michael Roedel
+  ~ Copyright (c) 2020 Michael Roedel
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<!DOCTYPE html>
+<html ng-app="msWebApp" ng-strict-di="ng-strict-di"
+      xmlns:th="http://www.springframework.org/schema/mvc" ng-controller="ShellController as shell">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>NextBill - WebApp</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="vendor/font-nunito.css" rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="css/sb-admin-2.css" rel="stylesheet">
+    <link href="css/main.css" rel="stylesheet" type="text/css"/>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var csrfToken = [[${xsrfTokenName}]];
+        /*]]>*/
+    </script>
+
+</head>
+
+<body id="page-top">
+
+<div th:if="${param.fullscreen == null}">
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" ui-sref="invoices.list">
+                <div class="sidebar-brand-text mx-2" style="font-size:1.3rem">Next<span style="color:#132852">Bill</span></div>
+                <div class="sidebar-brand-icon">
+                    <img src="img/logo.png" class="img-circle" alt="" height="50"/>
+                </div>
+            </a>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item">
+                <a class="nav-link" ui-sref="invoices.list">
+                    <i class="fas fa-fw fa-balance-scale-left"></i>
+                    <span>Rechnungen</span></a>
+            </li>
+
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item">
+                <a class="nav-link" ui-sref="standingorders.list">
+                    <i class="fas fa-fw fa-sync"></i>
+                    <span>Daueraufträge</span></a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider"/>
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Sonstiges
+            </div>
+
+            <li class="nav-item">
+                <a class="nav-link" ui-sref="fileanalyses.upload">
+                    <i class="fas fa-fw fa-file-upload"></i>
+                    <span>Dateiupload</span></a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" ui-sref="billings.processList">
+                    <i class="fas fa-fw fa-file-invoice-dollar"></i>
+                    <span>Abrechnungen</span></a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" ui-sref="budgets.list">
+                    <i class="fas fa-fw fa-funnel-dollar"></i>
+                    <span>Budgets</span></a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" ui-sref="analysis.charts">
+                    <i class="fas fa-fw fa-chart-line"></i>
+                    <span>Auswertung</span></a>
+            </li>
+
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item">
+                <a class="nav-link" href="webapp/api/android/client/download/nextbill.apk">
+                    <i class="fab fa-fw fa-android"></i>
+                    <span>Android App</span></a>
+            </li>
+
+            <div ng-if="(shell.userCanEditUsers || shell.userCanEditSettings) && shell.settingsLoaded">
+                <!-- Divider -->
+                <hr class="sidebar-divider d-none d-md-block">
+
+                <!-- Heading -->
+                <div class="sidebar-heading">
+                    Verwaltung
+                </div>
+
+                <li class="nav-item" ng-if="shell.userCanEditUsers">
+                    <a class="nav-link" ui-sref="user.list">
+                        <i class="fas fa-users"></i>
+                        <span>Benutzerverwaltung</span></a>
+                </li>
+
+                <li class="nav-item" ng-if="shell.userCanEditSettings">
+                    <a class="nav-link" ui-sref="setup">
+                        <i class="fas fa-tools"></i>
+                        <span>Konfiguration</span></a>
+                </li>
+            </div>
+
+            <!-- Sidebar Toggler (Sidebar) -->
+<!--            <div class="text-center d-none d-md-inline">-->
+<!--                <button class="rounded-circle border-0" id="sidebarToggle"></button>-->
+<!--            </div>-->
+        </ul>
+        <!-- End of Sidebar -->
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                    <!-- Sidebar Toggle (Topbar) -->
+                    <button id="sidebarToggleTop" class="btn btn-link rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+                    <!-- Topbar Navbar -->
+                    <ul class="navbar-nav ml-auto">
+
+                        <!-- Nav Item - Messages -->
+                        <li class="nav-item dropdown no-arrow mx-1">
+                            <a class="nav-link dropdown-toggle" href="" id="messagesDropdown" role="button"
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-envelope fa-fw"></i>
+                                <!-- Counter - Messages -->
+                                <span class="badge badge-danger badge-counter"><span class="ng-cloak">{{shell.countOfMessages()}}</span></span>
+                            </a>
+                            <!-- Dropdown - Messages -->
+                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                 aria-labelledby="messagesDropdown">
+                                <h6 class="dropdown-header">
+                                    Nachrichten
+                                </h6>
+                                <div class="mr-1" ng-if="shell.getMessages().length == 0">Keine vorhanden!</div>
+                                <div ng-repeat="message in shell.getMessages()">
+                                    <a class="dropdown-item d-flex align-items-center" href="">
+                                        <div class="dropdown-list-image mr-3">
+
+                                        </div>
+                                        <div class="font-weight-bold">
+                                            <div class="text-truncate">{{message.subject}}
+                                            </div>
+                                            <div class="small">{{message.message}}</div>
+                                            <div class="dropdown-message">
+                                                <div class="btn btn-primary" ng-if="message.messageType === 'TO_PAY'"
+                                                     ng-click="shell.firstAction(message)">Zahlung ausgeführt
+                                                </div>
+                                                <div class="btn btn-primary" ng-if="message.messageType === 'PAID'"
+                                                     ng-click="shell.firstAction(message)">Zahlung erhalten
+                                                </div>
+                                                <div class="btn btn-primary"
+                                                     ng-if="message.messageType === 'WAIT_FOR_PAYMENT'"
+                                                     ng-click="shell.firstAction(message)">Zahlung erhalten
+                                                </div>
+                                                <div class="btn btn-primary"
+                                                     ng-if="message.messageType === 'PAYMENT_CONFIRMED'"
+                                                     ng-click="shell.firstAction(message)">Abrechnung abschließen
+                                                </div>
+
+                                                <div class="btn btn-danger" ng-if="message.messageType === 'TO_PAY'"
+                                                     ng-click="shell.secondAction(message)">Stornieren
+                                                </div>
+                                                <div class="btn btn-danger"
+                                                     ng-if="message.messageType === 'WAIT_FOR_PAYMENT'"
+                                                     ng-click="shell.secondAction(message)">Stornieren
+                                                </div>
+                                                <div class="btn btn-primary" ng-if="message.messageType === 'MISTAKE'"
+                                                     ng-click="shell.problemSolved(message)">Überprüft
+                                                </div>
+                                                <div class="btn btn-secondary mr-1" ng-if="message.messageType === 'MISTAKE'"
+                                                     ng-click="shell.goToInvoice(message.object1Id)">Rechnung ansehen
+                                                </div>
+                                                <div class="btn btn-primary mr-1" ng-if="message.messageType === 'BILLING'"
+                                                     ng-click="shell.thirdAction(message)">OK
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+<!--                                <a class="dropdown-item text-center small text-gray-500" href="#">Read More Messages</a>-->
+                            </div>
+                        </li>
+
+                        <div class="topbar-divider d-none d-sm-block"></div>
+
+                        <!-- Nav Item - User Information -->
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="" id="userDropdown" role="button"
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small"><span class="ng-cloak">{{shell.currentUser.appUserName}}</span></span>
+                                <h4 class="d-inline"><i class="fas fa-user-astronaut text-gray-500"></i></h4>
+                            </a>
+                            <!-- Dropdown - User Information -->
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                 aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href="third-party-report.html" target="_blank">
+                                    <i class="fas fa-certificate fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Lizenzen
+                                </a>
+                                <a class="dropdown-item" ui-sref="profile">
+                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Profil
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="logout">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Logout
+                                </a>
+                            </div>
+                        </li>
+
+                    </ul>
+
+                </nav>
+                <!-- End of Topbar -->
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+
+                    <div ng-if="false" class="row justify-content-center" style="z-index: 10000;">
+                        <div class="col-12">
+                            <h2 class="m-5 text-gray-500">
+                                <div>
+                                    <span class='letter'>L</span><span class='letter'>o</span><span
+                                        class='letter'>a</span><span class='letter'>d</span><span
+                                        class='letter'>i</span><span class='letter'>n</span><span
+                                        class='letter'>g</span><span class='letter'>.</span><span
+                                        class='letter'>.</span><span class='letter'>.</span>
+                                </div>
+                            </h2>
+                        </div>
+                    </div>
+                    <ui-view class="page__view view"></ui-view>
+
+                </div>
+                <!-- /.container-fluid -->
+
+            </div>
+            <!-- End of Main Content -->
+
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Copyright &copy; NextBill 2020<br/>[[${buildVersion}]]</span>
+                    </div>
+                </div>
+            </footer>
+            <!-- End of Footer -->
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+
+</div>
+<div th:if="${param.fullscreen}">
+    <div ng-if="false" class="w-100 mt-5 justify-content-center" style="z-index: 10000;">
+        <h2 class="m-5 text-gray-500">
+            <div>
+                <span class='letter'>L</span><span class='letter'>o</span><span
+                    class='letter'>a</span><span class='letter'>d</span><span
+                    class='letter'>i</span><span class='letter'>n</span><span
+                    class='letter'>g</span><span class='letter'>.</span><span
+                    class='letter'>.</span><span class='letter'>.</span>
+            </div>
+        </h2>
+    </div>
+    <div class="m-5">
+        <ui-view></ui-view>
+    </div>
+</div>
+
+<ms-notification></ms-notification>
+
+<!-- Bootstrap core JavaScript-->
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="vendor/chart.js/Chart.min.js"></script>
+
+<!-- Core plugin JavaScript-->
+<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<!-- Custom scripts for all pages-->
+<script src="js/sb-admin-2.js"></script>
+
+<span th:if="${param.devMode != null}">
+    <script src="dist/js/vendor.min.js"></script>
+
+    <script src="app/app.module.js"></script>
+    <script src="app/app.config.js"></script>
+
+    <script src="app/components/ms-input-date.component.js"></script>
+    <script src="app/components/ms-paymentperson-select.directive.js"></script>
+    <script src="app/components/ms-costdistribution-calculate.directive.js"></script>
+    <script src="app/components/ms-invoicecategorie-select.directive.js"></script>
+    <script src="app/notifications/notification.directive.js"></script>
+    <script src="app/components/ms-search-configuration.directive.js"></script>
+    <script src="app/components/ms-invoice-table.component.js"></script>
+    <script src="app/components/ms-invoice-summary.component.js"></script>
+    <script src="app/components/ms-articles-select.component.js"></script>
+
+    <script src="app/billings/billing.service.js"></script>
+    <script src="app/invoices/invoice.service.js"></script>
+    <script src="app/businesspartners/businesspartner.service.js"></script>
+    <script src="app/usercontacts/usercontact.service.js"></script>
+    <script src="app/costdistributionitems/costdistributionitem.service.js"></script>
+    <script src="app/costdistributionitems/costdistribution.service.js"></script>
+    <script src="app/services/costdistributioncalculate.service.js"></script>
+    <script src="app/invoiceimages/invoiceimage.service.js"></script>
+    <script src="app/invoicecategories/invoicecategories.service.js"></script>
+    <script src="app/budgets/budget.service.js"></script>
+    <script src="app/services/search.service.js"></script>
+    <script src="app/notifications/notification.service.js"></script>
+    <script src="app/messages/message.service.js"></script>
+    <script src="app/analysis/analysis.service.js"></script>
+    <script src="app/user/user.service.js"></script>
+    <script src="app/settings/settings.service.js"></script>
+
+    <script src="app/invoices/invoice-list.controller.js"></script>
+    <script src="app/invoices/invoice-edit.controller.js"></script>
+    <script src="app/dashboard/dashboard.controller.js"></script>
+    <script src="app/budgets/budget.service.js"></script>
+    <script src="app/budgets/budget-list.controller.js"></script>
+    <script src="app/budgets/budget-edit.controller.js"></script>
+    <script src="app/billings/billing-create.controller.js"></script>
+    <script src="app/billings/billing-details.controller.js"></script>
+    <script src="app/analysis/analysis-chart.controller.js"></script>
+    <script src="app/standingorders/standingorder-list.controller.js"></script>
+    <script src="app/billings/billing-process-list.controller.js"></script>
+    <script src="app/fileanalyses/fileanalyses-upload.controller.js"></script>
+    <script src="app/settings/profile.controller.js"></script>
+    <script src="app/settings/setup.controller.js"></script>
+    <script src="app/shell/shell.controller.js"></script>
+    <script src="app/user/user-list.controller.js"></script>
+</span>
+<span th:if="${param.devMode == null}">
+    <script src="dist/js/vendor.min.js"></script>
+    <script src="dist/js/app.min.js"></script>
+</span>
+
+</body>
+
+</html>

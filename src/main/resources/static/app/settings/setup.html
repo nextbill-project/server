@@ -1,0 +1,264 @@
+<!--
+  ~ NextBill server application
+  ~
+  ~ @author Michael Roedel
+  ~ Copyright (c) 2020 Michael Roedel
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div class="content">
+    <div ng-if="!vm.loaded">
+        <span class='letter'>L</span><span class='letter'>o</span><span
+            class='letter'>a</span><span class='letter'>d</span><span
+            class='letter'>i</span><span class='letter'>n</span><span
+            class='letter'>g</span><span class='letter'>.</span><span
+            class='letter'>.</span><span class='letter'>.</span>
+    </div>
+    <div  ng-if="vm.loaded">
+        <header>
+            <h2 class="header__title">
+                <i class="fas fa-tools"></i>
+                <span ng-if="!vm.setupData.isCustomized">Installation von NextBill</span>
+                <span ng-if="vm.setupData.isCustomized">Konfiguration</span>
+            </h2>
+        </header>
+
+        <form ng-submit="vm.saveData()">
+            <div class="row justify-content-center">
+
+                <div class="col-8">
+
+                    <h2 class="mb-0">
+                        Allgemein
+                    </h2>
+                    <div class="card mb-3 setup-edit__overall-settings__border-color">
+                        <div class="card-body">
+
+                            <div ng-if="!vm.setupData.isCustomized">
+                                <div class="form-group">
+                                    <label for="adminName">Name des Administrator</label>
+                                    <input type="text" class="form-control" id="adminName" placeholder="Michael" ng-model="vm.setupData.adminName" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="adminMail">E-Mail-Adresse des Administrator</label>
+                                    <input type="email" class="form-control" id="adminMail" placeholder="name@example.com" ng-model="vm.setupData.adminMail" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="adminPassword">Passwort für den Administrator</label>
+                                    <input type="password" class="form-control" id="adminPassword" placeholder="********" ng-model="vm.setupData.adminPassword" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="pathToFiles">Speicherort für Dateien</label>
+                                <input type="text" class="form-control" id="pathToFiles" placeholder="/nextbill" ng-model="vm.setupData.filesPath" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="domainUrl">Domain URL</label>
+                                <input type="text" class="form-control" id="domainUrl"  required
+                                       placeholder="http://www.yourdomain.de" ng-model="vm.setupData.domainUrl">
+                            </div>
+                            <div class="mb-4">
+                                <button type="button" class="btn btn-secondary" ng-click="vm.versionCheck()">Überprüfen auf Updates</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h2 class="mb-0">
+                        Zusatzfunktionen
+                    </h2>
+
+                    <div class="accordion" id="setupSteps">
+                        <div class="card">
+                            <div class="card-header" id="headingTwo">
+                                <h2 class="mb-0">
+                                    <button class="btn btn-link" type="button" data-toggle="collapse"
+                                            data-target="#collapseSMTP" aria-expanded="false" aria-controls="collapseSMTP">
+                                        E-Mails versenden
+                                    </button>
+                                </h2>
+                            </div>
+
+                            <div id="collapseSMTP" class="collapse" aria-labelledby="headingTwo" data-parent="#setupSteps">
+                                <div class="card-body">
+                                    <div class="form-group form-check">
+                                        <input type="checkbox" class="form-check-input" id="smtpMailServiceEnabled"
+                                               ng-model="vm.setupData.smtpMailServiceEnabled">
+                                        <label class="form-check-label" for="smtpMailServiceEnabled">E-Mail-Versand aktivieren</label>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="smtpServer">Server</label>
+                                        <input type="text" class="form-control" id="smtpServer" placeholder="mail.gmx.net" ng-disabled="!vm.setupData.smtpMailServiceEnabled"
+                                               ng-required="vm.setupData.smtpMailServiceEnabled" ng-model="vm.setupData.smtpServer">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="smtpUser">Anmeldename</label>
+                                        <input type="text" class="form-control" id="smtpUser" placeholder="name@example.com"  ng-disabled="!vm.setupData.smtpMailServiceEnabled"
+                                               ng-required="vm.setupData.smtpMailServiceEnabled" ng-model="vm.setupData.smtpUser">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="smtpPassword">Anmeldepasswort</label>
+                                        <input type="password" class="form-control" id="smtpPassword" placeholder="********"  ng-disabled="!vm.setupData.smtpMailServiceEnabled"
+                                               ng-required="vm.setupData.smtpMailServiceEnabled" ng-model="vm.setupData.smtpPassword">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="smtpEmail">E-Mail-Adresse</label>
+                                        <input type="email" class="form-control" id="smtpEmail" placeholder="name@example.com"  ng-disabled="!vm.setupData.smtpMailServiceEnabled"
+                                               ng-required="vm.setupData.smtpMailServiceEnabled" ng-model="vm.setupData.smtpEmail">
+                                    </div>
+                                    <div class="mb-4">
+                                        <button type="button" class="btn btn-secondary" ng-click="vm.sendTestMail()" ng-disabled="!vm.setupData.smtpMailServiceEnabled">Sende Test-Mail</button>
+                                    </div>
+                                    <hr/>
+                                    <div class="form-group form-check">
+                                        <input type="checkbox" class="form-check-input" id="linksInMails"  ng-disabled="!vm.setupData.smtpMailServiceEnabled"
+                                               ng-model="vm.setupData.linksInMails">
+                                        <label class="form-check-label" for="linksInMails">Links in E-Mails setzen</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header" id="headingOne">
+                                <h2 class="mb-0">
+                                    <button class="btn btn-link" type="button" data-toggle="collapse"
+                                            data-target="#collapseIMAP" aria-expanded="false" aria-controls="collapseIMAP">
+                                        E-Mails empfangen
+                                    </button>
+                                </h2>
+                            </div>
+
+                            <div id="collapseIMAP" class="collapse" aria-labelledby="headingOne" data-parent="#setupSteps">
+                                <div class="card-body">
+                                    <div class="form-group form-check">
+                                        <input type="checkbox" class="form-check-input" id="imapMailServiceEnabled"
+                                               ng-model="vm.setupData.imapMailServiceEnabled">
+                                        <label class="form-check-label" for="imapMailServiceEnabled">E-Mail-Empfang aktivieren</label>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="imapServer">Server</label>
+                                        <input type="text" class="form-control" id="imapServer" placeholder="imap.gmx.net"  ng-disabled="!vm.setupData.imapMailServiceEnabled"
+                                               ng-required="vm.setupData.imapMailServiceEnabled" ng-model="vm.setupData.imapServer">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="imapUser">Anmeldename</label>
+                                        <input type="text" class="form-control" id="imapUser" placeholder="name@example.com" ng-disabled="!vm.setupData.imapMailServiceEnabled"
+                                               ng-required="vm.setupData.imapMailServiceEnabled" ng-model="vm.setupData.imapUser">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="imapPassword">Anmeldepasswort</label>
+                                        <input type="password" class="form-control" id="imapPassword" placeholder="********" ng-disabled="!vm.setupData.imapMailServiceEnabled"
+                                               ng-required="vm.setupData.imapMailServiceEnabled" ng-model="vm.setupData.imapPassword">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="imapEmail">E-Mail-Adresse</label>
+                                        <input type="email" class="form-control" id="imapEmail" ng-disabled="!vm.setupData.imapMailServiceEnabled"
+                                               ng-required="vm.setupData.imapMailServiceEnabled" placeholder="name@example.com" ng-model="vm.setupData.imapEmail">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="imapPath">Pfad zum IMAP-Ordner</label>
+                                        <input type="text" class="form-control" id="imapPath" placeholder="INBOX" ng-disabled="!vm.setupData.imapMailServiceEnabled"
+                                               ng-required="vm.setupData.imapMailServiceEnabled" ng-model="vm.setupData.imapPath">
+                                    </div>
+                                    <div class="form-group form-check">
+                                        <input type="checkbox" class="form-check-input" id="deleteMail" ng-disabled="!vm.setupData.imapMailServiceEnabled"
+                                               ng-model="vm.setupData.deleteMail">
+                                        <label class="form-check-label" for="deleteMail">Analysierte Mails vom Server
+                                            löschen</label>
+                                    </div>
+                                    <hr/>
+                                    <div class="form-group form-check">
+                                        <input type="checkbox" class="form-check-input" id="useFirefoxForHtmlToImage"  ng-disabled="!vm.setupData.imapMailServiceEnabled"
+                                               ng-model="vm.setupData.useFirefoxForHtmlToImage">
+                                        <label class="form-check-label" for="useFirefoxForHtmlToImage">Firefox zur Erzeugung von
+                                            E-Mail-Screenshots verwenden.</label>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="pathToFirefox">Pfad zu Firefox</label>
+                                        <input type="text" class="form-control" id="pathToFirefox"  ng-disabled="!vm.setupData.imapMailServiceEnabled || !vm.setupData.useFirefoxForHtmlToImage"
+                                               placeholder="/usr/bin/firefox" ng-model="vm.setupData.pathToFirefox">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card mb-3">
+                            <div class="card-header" id="headingThree">
+                                <h2 class="mb-0">
+                                    <button class="btn btn-link" type="button" data-toggle="collapse"
+                                            data-target="#collapseScansio" aria-expanded="false"
+                                            aria-controls="collapseScansio">
+                                        Automatische Quittungs-Erfassung (Scansio)
+                                    </button>
+                                </h2>
+                            </div>
+
+                            <div id="collapseScansio" class="collapse" aria-labelledby="headingThree"
+                                 data-parent="#setupSteps">
+                                <div class="card-body">
+                                    Die Quittungs-Analyse von Scansio vereinfacht die Erfassung von Rechnungen durch Auslesen von Geschäft, Kaufdatum und Rechnungssumme aus Quittungsbildern, Spracheingaben und E-Mails. NextBill leitet aus diesen Daten dann weitere Informationen her, wie bspw. die Kategorie oder die Kostenverteilung. Außerdem können auf Quittungsbildern Artikel ausgewählt und zugehörige Preise ermittelt und summiert werden. <br/>
+                                    <br/>
+                                    <b>Derzeit befindet sich Scansio noch in der Beta-Phase.</b><br/><br/> Sobald offiziell verfügbar, gehen Sie bitte folgendermaßen vor:<br/>
+                                    1. Registrieren Sie sich auf <a href="https://scansio.de" target="_blank">scansio.de</a> und laden Sie das Prepaid-Konto auf.<br/>
+                                    2. Kopieren Sie den im Administrationsbereich von Scansio angezeigten Access-Token.<br/>
+                                    3. Aktivieren Sie die Checkbox unten und fügen Sie den Access-Token im Feld "Access Token" ein.<br/>
+                                    4. Speichern Sie die Konfiguration.<br/>
+                                    5. Aktivieren Sie in der Benutzerverwaltung für jeden Benutzer die Option zur Nutzung von Scansio.<br/><br/>
+
+                                    Sie können nun sofort loslegen. Die Kosten richten sich nach Ihrem ausgewählten Paket. Bitte beachten Sie: Ihr Vertragspartner ist Scansio, NextBill greift lediglich auf die bereitgestellte API zu.
+                                    <br/><br/>Weitere Infos auf <a href="https://scansio.de" target="_blank">scansio.de</a>.<br/>
+                                    <div class="form-group form-check mt-3">
+                                        <input type="checkbox" class="form-check-input" id="scansioEnabled"
+                                               ng-model="vm.setupData.scansioEnabled">
+                                        <label class="form-check-label" for="scansioEnabled">Scansio zum automatischen
+                                            Auslesen der Quittungen verwenden.</label>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="scansioAccessToken">Access Token</label>
+                                        <input type="text" class="form-control" id="scansioAccessToken" ng-disabled="!vm.setupData.scansioEnabled" ng-required="vm.setupData.scansioEnabled"
+                                               placeholder="vkf9d7dm3nFGl...." ng-model="vm.setupData.scansioAccessToken">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-100; text-right">
+                        <input type="submit" class="btn btn-primary" value="Setup abschließen" ng-if="!vm.setupData.isCustomized"/>
+                        <input type="submit" class="btn btn-primary" value="Speichern" ng-if="vm.setupData.isCustomized"/>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+    <div id="updateModalDialog" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Suche nach Updates</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div><b>Version Ihrer Instanz:</b> {{vm.version.currentVersion}}</div>
+                    <div><b>Aktuellste Version:</b> {{vm.version.newestVersion}}</div>
+
+                    <div class="mt-3" ng-if="vm.version.currentVersion !== vm.version.newestVersion">Es ist eine aktuellere Version verfügbar! Bitte besuchen Sie die <a href="https://github.com/nextbill-project/server/releases" target="_blank">Release-Seite auf GitHub</a>, lade Sie die aktuelle Release-Version herunter und ersetzen Sie Ihre Jar.</div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Schliessen</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

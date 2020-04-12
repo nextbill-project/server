@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.3.0.final using JasperReports Library version 6.3.0  -->
+<!-- 2017-08-19T15:08:34 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="billingPdf" pageWidth="595" pageHeight="842" columnWidth="495" leftMargin="50" rightMargin="50" topMargin="20" bottomMargin="20" uuid="e55fbe10-2686-40ab-98f1-9809a9531590">
+	<parameter name="creditorString" class="java.lang.String"/>
+	<parameter name="debitorString" class="java.lang.String"/>
+	<parameter name="isReverse" class="java.lang.Boolean"/>
+	<parameter name="sumTotal" class="java.math.BigDecimal"/>
+	<field name="invoiceReceiptDate" class="java.util.Date"/>
+	<field name="paymentRecipient" class="java.lang.String"/>
+	<field name="description" class="java.lang.String"/>
+	<field name="totalCost" class="java.math.BigDecimal"/>
+	<field name="partCost" class="java.math.BigDecimal"/>
+	<field name="creditorDebitor" class="java.lang.String"/>
+	<variable name="sumCreditorDebitor" class="java.math.BigDecimal" resetType="Group" resetGroup="CreditorDebitorGroup" calculation="Sum">
+		<variableExpression><![CDATA[$F{partCost}]]></variableExpression>
+	</variable>
+	<group name="summaryPart">
+		<groupFooter>
+			<band height="111">
+				<textField>
+					<reportElement x="0" y="11" width="495" height="19" uuid="3816ddb6-02dc-4f43-ba00-7eb66d892185">
+						<printWhenExpression><![CDATA[$P{isReverse} == false]]></printWhenExpression>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Folgender Betrag ist von " + $P{creditorString} + " an " + $P{debitorString} + " zu zahlen:"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="31" width="495" height="19" uuid="c76cc826-313a-4e8b-85cd-cf8742018a6d">
+						<printWhenExpression><![CDATA[$P{isReverse} == true]]></printWhenExpression>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Folgender Betrag ist von " + $P{debitorString} + " an " + $P{creditorString} + " zu zahlen:"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="250" y="61" width="245" height="50" uuid="b914e1e1-ac7a-4ec2-97bc-c54148c143b1"/>
+					<textElement textAlignment="Right">
+						<font size="16" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new DecimalFormat( "#,###,###,##0.00 €" ).format($P{sumTotal})]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<group name="CreditorDebitorGroup">
+		<groupExpression><![CDATA[$F{creditorDebitor}]]></groupExpression>
+		<groupHeader>
+			<band height="56">
+				<staticText>
+					<reportElement x="90" y="33" width="110" height="20" uuid="eb7ae890-f431-45f3-a5f3-3549fa0dbc1b"/>
+					<textElement>
+						<font size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Empfänger]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="200" y="33" width="130" height="20" uuid="2aeb4ffc-c99f-4b75-8599-61347ca80a37"/>
+					<textElement>
+						<font size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Beschreibung]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="330" y="33" width="80" height="20" uuid="3b3309ee-b8e2-4245-9820-90b0300c9790"/>
+					<textElement textAlignment="Right">
+						<font size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Gesamt]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="410" y="33" width="85" height="20" uuid="b4d2c224-0fed-434d-924d-bcb431adafc3">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<textElement textAlignment="Right">
+						<font size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Anteil]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="33" width="90" height="20" uuid="145be75b-bbf7-4b74-a8e1-10555049bad7"/>
+					<textElement>
+						<font size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Datum]]></text>
+				</staticText>
+				<line>
+					<reportElement x="0" y="55" width="495" height="1" uuid="fbd343a5-4ca5-4516-9a1e-45801ad038b8">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+					<graphicElement>
+						<pen lineWidth="3.0" lineStyle="Solid"/>
+					</graphicElement>
+				</line>
+				<textField>
+					<reportElement x="0" y="0" width="495" height="30" uuid="181592d1-3c51-408f-9d68-7737f6d1e4f5"/>
+					<textElement>
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{creditorDebitor}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="39">
+				<line>
+					<reportElement x="0" y="0" width="495" height="1" uuid="4b1d76ee-7166-4954-a03f-a4fb6ef34cd0">
+						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					</reportElement>
+				</line>
+				<staticText>
+					<reportElement x="330" y="1" width="80" height="18" uuid="0e41da74-3eb9-4f1e-9eaa-2cfa9be73fa2"/>
+					<textElement textAlignment="Right">
+						<font size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Summe:]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="410" y="1" width="85" height="18" uuid="c05b6e75-b4ad-449d-b42d-da0cc5d81438"/>
+					<textElement textAlignment="Right">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new DecimalFormat( "#,###,###,##0.00 €" ).format($V{sumCreditorDebitor})]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="350" y="20" width="145" height="1" uuid="67f9609f-1ecd-42b3-bdef-5a7e4c3205cc"/>
+					<graphicElement>
+						<pen lineWidth="2.0" lineStyle="Solid"/>
+					</graphicElement>
+				</line>
+			</band>
+		</groupFooter>
+	</group>
+	<title>
+		<band height="40" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="10" width="495" height="30" uuid="b8149610-3657-47a7-80e3-dbd18f26167b">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font size="20" isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Abrechnung]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="36">
+			<textField>
+				<reportElement x="110" y="0" width="385" height="30" uuid="6e8671fa-0600-48be-b2e6-0c0987bc17b4"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{creditorString}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="110" height="30" uuid="20d73a84-c270-4b7d-9857-9e97297680b7"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Angefordert von:]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="90" height="19" uuid="f71034ee-f7aa-4e47-93ba-65c8be13d8d3"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{invoiceReceiptDate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="90" y="0" width="110" height="19" uuid="0acc7872-a314-4a0e-ab0f-900643acf1ab"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{paymentRecipient}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="330" y="0" width="80" height="19" uuid="594baa77-df32-4316-8e19-b8b002cdd66a"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[new DecimalFormat( "#,###,###,##0.00 €" ).format($F{totalCost})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="410" y="1" width="85" height="19" uuid="c3ea6a4b-b28e-4761-a8a3-66893936e02b">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[new DecimalFormat( "#,###,###,##0.00 €" ).format($F{partCost})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="200" y="0" width="130" height="19" uuid="bbdea3ac-3657-48d7-b495-283444e9deb6"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

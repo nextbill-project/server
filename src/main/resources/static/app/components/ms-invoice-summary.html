@@ -1,0 +1,131 @@
+<!--
+  ~ NextBill server application
+  ~
+  ~ @author Michael Roedel
+  ~ Copyright (c) 2020 Michael Roedel
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div class="invoice-summary">
+	<div class="row mb-3">
+		<div ng-class="vm.hasInvoiceImageValue ? 'col-12 col-xl-8' : 'col-12'">
+			<form name="invoiceForm" ng-submit="invoiceForm.$valid && vm.submitForm()">
+				<div class="row">
+					<div ng-class="(vm.invoice.mainFunctionEnum === 'EXPENSE' && !vm.invoice.reverseInvoice) || (vm.invoice.mainFunctionEnum !== 'EXPENSE' && vm.invoice.reverseInvoice) ? 'col-6' : 'd-none'">
+						<h5>Zahlungsempfänger</h5>
+						<div class="row">
+							<div class="col-9">
+								{{vm.paymentRecipientName}}
+							</div>
+							<div class="col-3">
+
+							</div>
+						</div>
+					</div>
+					<div ng-class="(vm.invoice.mainFunctionEnum === 'INCOME' && !vm.invoice.reverseInvoice) || (vm.invoice.mainFunctionEnum !== 'INCOME' && vm.invoice.reverseInvoice) ? 'col-6' : 'd-none'">
+						<h5>Geldgeber</h5>
+						<div class="row">
+							<div class="col-9">
+								{{vm.payerName}}
+							</div>
+						</div>
+					</div>
+					<div class="col-6">
+						<h5>Summe</h5>
+						{{vm.invoice.sumOfInvoice | number}} EUR
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6">
+						<h4 ng-if="!vm.isStandingOrder">Datum</h4>
+						<h4 ng-if="vm.isStandingOrder">Nächste Ausführung</h4>
+						<ms-input-date ms-value="vm.invoice.dateOfInvoice" dense="true" ms-disabled="vm.isReadOnlyMode || vm.isStandingOrder" ms-set-null="false"></ms-input-date>
+					</div>
+
+					<div class="col-6">
+						<h5>Sonderfall</h5>
+						<div class="checkbox">
+							<label>
+								<input type="checkbox" ng-model="vm.invoice.specialType" ng-disabled="vm.isReadOnlyMode">Aktiv
+							</label>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6">
+						<h5>Zahlungsart</h5>
+						<select name="repeatSelect" class="form-control w-100" ng-model="vm.invoice.paymentTypeEnum" ng-disabled="vm.isReadOnlyMode">
+							<option ng-repeat="paymentTypeEnum in vm.paymentTypeEnums"
+									value="{{paymentTypeEnum.name}}">
+								{{paymentTypeEnum.displayName}}
+							</option>
+						</select>
+					</div>
+					<div class="col-6">
+						<h5>Kategorie</h5>
+						{{vm.invoice.invoiceCategoryDTO.invoiceCategoryName}}
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-12">
+						<h5>Beschreibung</h5>
+						<textarea rows="2" maxlength="60000" class="form-control w-100" ng-model="vm.invoice.remarks" ng-disabled="vm.isReadOnlyMode"/>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-12">
+						<h5>Kostenverteilung</h5>
+						<div class="table-responsive invoice-edit__table">
+							<table class="table table-hover">
+								<thead>
+								<tr>
+									<th>Name</th>
+									<th>Summe</th>
+								</tr>
+								</thead>
+								<tbody>
+								<tr class="datatable__has-click-event" ng-repeat="costDistributionItem in vm.costDistributionItems" ng-if="vm.invoice.sumOfInvoice != undefined">
+									<td>
+										<div>
+											{{costDistributionItem.payerDTO.displayName}}
+										</div>
+									</td>
+									<td>
+										{{costDistributionItem.moneyValue | number}} €
+									</td>
+								</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+		<div ng-class="vm.hasInvoiceImageValue ? 'd-none d-xl-block col-xl-4' : 'd-none'">
+			<img ng-src="{{vm.getInvoiceImageUrl()}}" class="img-fluid" ng-if="vm.hasInvoiceImageValue"/>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-8">
+
+		</div>
+		<div class="col-4">
+			<span class="btn btn-primary float-right" ng-click="vm.goToInvoice()">
+				Bearbeiten
+			</span>
+		</div>
+	</div>
+</div>

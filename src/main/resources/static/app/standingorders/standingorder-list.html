@@ -1,0 +1,106 @@
+<!--
+  ~ NextBill server application
+  ~
+  ~ @author Michael Roedel
+  ~ Copyright (c) 2020 Michael Roedel
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div class="content">
+    <header>
+        <h2 class="header__title">
+            <i class="fas fa-fw fa-sync"></i>
+            Daueraufträge
+        </h2>
+    </header>
+    <div>
+        <div class="row">
+            <div class="d-xl-none col-12 mb-3">
+                <button type="button" class="btn btn-outline-secondary w-100" data-toggle="collapse" data-target="#searchConfigurationPart">Suchfilter</button>
+                <div id="searchConfigurationPart" class="collapse">
+                    <ms-search-configuration ms-start-search="vm.startSearch">
+                    </ms-search-configuration>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mb-3">
+                <div class="float-right">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-outline-secondary d-none d-xl-block" ng-click="vm.toggleFilterView();">Filter</button>
+                    </div>
+                </div>
+                <div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-primary d-none d-xl-block" ng-click="vm.newExpense();">Ausgabe</button>
+                        <button type="button" class="btn btn-primary d-none d-xl-block" ng-click="vm.newIncome();">Einnahme</button>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-primary d-xl-none" context-menu="vm.otherMenuOptions" context-menu-on="click">Neu</button>
+                        <button type="button" class="btn btn-primary d-xl-none" ng-click="vm.refreshInvoices();"><span class="fa fa-refresh"></span></button>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-secondary d-none d-xl-block align-middle" ng-click="vm.refreshInvoices();"><i class="fas fa-sync-alt standing-order__menu-item"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <main ng-class="vm.toggleFilter ? 'col-12 col-xl-9' : 'col-12'">
+                <div class="mx-auto my-5" ng-if="vm.invoiceServiceLoading()">
+                    <div class="loader loader__small"></div>
+                </div>
+                <section class="tab-content m-0">
+                    <table class="table table-hover" ng-if="!vm.invoiceServiceLoading()">
+                        <thead>
+                        <tr>
+                            <th class="d-none d-md-table-cell">Zahlungsempfänger</th>
+                            <th class="d-md-none">Zahlungsempfänger/<br/>Summe</th>
+                            <th class="d-none d-md-table-cell">Summe</th>
+                            <th>Nächste Ausführung</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="datatable__has-click-event" ng-click="vm.goToInvoice(invoice.invoiceId, 'CHECK')"
+                                ng-repeat="invoice in vm.getInvoices('STANDING_ORDER') | orderBy:'-dateOfInvoice'">
+                                <td class="d-none d-md-table-cell">
+                                    <div ng-if="invoice.mainFunctionEnum === 'EXPENSE'">{{invoice.paymentRecipientDTO.displayName}}</div>
+                                    <div ng-if="invoice.mainFunctionEnum === 'INCOME'">{{invoice.payerDTO.displayName}}</div>
+                                </td>
+                                <td class="d-md-none">
+                                    <div ng-if="invoice.mainFunctionEnum === 'EXPENSE'">{{invoice.paymentRecipientDTO.displayName}}</div>
+                                    <div ng-if="invoice.mainFunctionEnum === 'INCOME'">{{invoice.payerDTO.displayName}}</div>
+                                    <h5>{{invoice.sumOfInvoice | number}} €</h5>
+                                </td>
+                                <td  ng-click="vm.toggleInvoiceDetails(invoice)" ng-class="invoice.mainFunctionEnum === 'INCOME' ? 'invoice-table__sum-column__color d-none d-md-table-cell' : 'd-none d-md-table-cell'">
+                                    <span class="invoice-table__sum-small__font-size">{{invoice.moneyValue | number}}</span>&nbsp;/ {{invoice.sumOfInvoice | number}}&nbsp;€
+                                </td>
+                                <td>{{invoice.dateOfInvoice | date:'d. MMMM yyyy'}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+            </main>
+            <aside ng-class="vm.toggleFilter ? 'd-none d-xl-block col-xl-3' : 'd-none'">
+                <div class="row">
+                    <div class="col-12">
+                        <ms-search-configuration ms-start-search="vm.startSearch">
+                        </ms-search-configuration>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+</div>

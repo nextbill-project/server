@@ -1,0 +1,95 @@
+<!--
+  ~ NextBill server application
+  ~
+  ~ @author Michael Roedel
+  ~ Copyright (c) 2020 Michael Roedel
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<table class="table table-hover" ng-if="!vm.invoiceServiceLoading()">
+	<thead>
+	<tr>
+		<th ng-if="vm.useSelection"></th>
+		<th>Quelle</th>
+		<th class="d-none d-md-table-cell">Datum</th>
+		<th class="d-none d-md-table-cell">Transaktionspartner</th>
+		<th class="d-md-none">Datum/Transaktionspartner</th>
+		<th>Summe</th>
+	</tr>
+	</thead>
+	<tbody>
+	<tr ng-repeat-start="invoice in vm.invoices | orderBy:'-dateOfInvoice'">
+		<td ng-if="vm.useSelection">
+			<div class="invoice-table__checkbox">
+				<i ng-if="!vm.isSelected(invoice)" ng-click="vm.toggleSelect(invoice)" class="far fa-square"></i>
+				<i ng-if="vm.isSelected(invoice)" ng-click="vm.toggleSelect(invoice)" class="fas fa-check-square"></i>
+			</div>
+		</td>
+		<td ng-click="vm.toggleInvoiceDetails(invoice)">
+			<div ng-if="invoice.invoiceWorkflowMode === 'EXTERNAL_USER_CHECK_MODE' || invoice.invoiceWorkflowMode === 'EXTERNAL_USER_READY_MODE'">
+				<div class="row">
+					<h4 class="col-12 text-center"><i class="fa fa-user-circle"></i></h4>
+				</div>
+				<div class="row">
+					<div class="col-12 text-center">{{invoice.createdByDTO.displayName}}</div>
+				</div>
+			</div>
+			<div ng-if="invoice.invoiceWorkflowMode === 'CREATED_USER_CHECK_MODE' || invoice.invoiceWorkflowMode === 'CREATED_USER_READY_MODE'">
+				<h3 class="text-center" ng-if="invoice.invoiceFailureMessage"><i class="fas fa-bolt"></i></h3>
+				<h3 class="text-center" ng-switch on="invoice.invoiceSource" ng-if="!invoice.invoiceFailureMessage">
+					<i ng-switch-when="CAMERA" class="fas fa-camera-retro"></i>
+					<i ng-switch-when="MAIL" class="fas fa-envelope-open-text"></i>
+					<i ng-switch-when="STANDING_ORDER" class="fas fa-sync"></i>
+					<i ng-switch-when="MIC" class="fas fa-microphone"></i>
+					<i ng-switch-when="ANALYZING" class="fas fa-cog fa-spin"></i>
+					<i ng-switch-default class="fas fa-hand-point-up"></i>
+				</h3>
+			</div>
+			<h3 class="text-center" ng-if="invoice.invoiceWorkflowMode == null || invoice.invoiceWorkflowMode == undefined">
+				<i ng-if="invoice.invoiceStatusEnum === 'ANALYZING'" class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
+			</h3>
+		</td>
+		<td  ng-click="vm.toggleInvoiceDetails(invoice)" class="d-none d-md-table-cell">{{invoice.dateOfInvoice | date:'d. MMMM yyyy'}}</td>
+		<td  ng-click="vm.toggleInvoiceDetails(invoice)" class="d-none d-md-table-cell">
+			<div ng-if="invoice.invoiceStatusEnum !== 'ANALYZING'">
+				<div ng-if="invoice.mainFunctionEnum === 'EXPENSE'">{{invoice.paymentRecipientDTO.displayName}}</div>
+				<div ng-if="invoice.mainFunctionEnum === 'INCOME'">{{invoice.payerDTO.displayName}}</div>
+			</div>
+			<div ng-if="invoice.invoiceStatusEnum === 'ANALYZING'">
+				Wird analysiert...
+			</div>
+		</td>
+		<td ng-click="vm.toggleInvoiceDetails(invoice)" class="d-md-none">
+			<div ng-if="invoice.invoiceStatusEnum !== 'ANALYZING'">
+				<div ng-if="invoice.mainFunctionEnum === 'EXPENSE'">{{invoice.paymentRecipientDTO.displayName}}</div>
+				<div ng-if="invoice.mainFunctionEnum === 'INCOME'">{{invoice.payerDTO.displayName}}</div>
+				<h5>{{invoice.dateOfInvoice | date:'d. MMMM yyyy'}}</h5>
+			</div>
+			<div ng-if="invoice.invoiceStatusEnum === 'ANALYZING'">
+				Wird analysiert...
+			</div>
+		</td>
+		<td  ng-click="vm.toggleInvoiceDetails(invoice)" ng-class="invoice.mainFunctionEnum === 'INCOME' ? 'invoice-table__sum-column__color' : ''">
+			<span ng-if="!vm.useDebtValue"><span class="invoice-table__sum-small__font-size">{{invoice.moneyValue | number}}</span>&nbsp;/ {{invoice.sumOfInvoice | number}}&nbsp;€</span>
+			<span ng-if="vm.useDebtValue"><span class="invoice-table__sum-small__font-size">{{invoice.debtValue | number}}</span> / {{invoice.sumOfInvoice | number}} €</span>
+		</td>
+	</tr>
+	<tr class="invoice-table__invoice-summary_bg-color" ng-repeat-end ng-if="vm.isInvoiceDetailsEnabled(invoice.invoiceId)">
+		<td colspan="6">
+			<ms-invoice-summary ms-invoice="invoice" ms-is-standing-order="false" ms-return-view="vm.returnView"></ms-invoice-summary>
+		</td>
+	</tr>
+	</tbody>
+</table>

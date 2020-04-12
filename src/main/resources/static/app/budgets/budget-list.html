@@ -1,0 +1,77 @@
+<!--
+  ~ NextBill server application
+  ~
+  ~ @author Michael Roedel
+  ~ Copyright (c) 2020 Michael Roedel
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div class="content">
+    <header>
+        <h2 class="header__title">
+            <i class="fas fa-fw fa-funnel-dollar"></i>
+            Budgets
+        </h2>
+    </header>
+    <main>
+        <div class="row">
+            <div class="col-12">
+                <button type="button" class="btn btn-primary" ng-click="vm.newBudget();">Neues Budget</button>
+                <div class="mx-auto mt-5" ng-if="vm.budgetServiceLoading()">
+                    <div class="loader loader__small"></div>
+                </div>
+                <div ng-if="!vm.budgetServiceLoading()">
+                    <div class="col-12">
+                        <div ng-repeat="budget in vm.budgets">
+                            <div class="d-inline float-left ml-2 mt-2 p-3 rounded budget-list__item">
+                                <div class="row">
+                                    <div class="col-12 text-center">
+                                        <h4>{{budget.name}}</h4>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 text-center">
+                                        <h4><span class="font-weight-bold">{{budget.currentSum}}</span> / {{budget.sum | number}} € - {{vm.displayNameForBudgetType(budget.budgetRepetitionType)}}</h4>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 text-center">
+                                        {{budget.filterText}}
+                                    </div>
+                                </div>
+                                <div class="row" ng-if="budget.lastExceeding">
+                                    <div class="col-12">
+                                        Letzte Überschreitung: {{budget.lastExceeding}} €
+                                    </div>
+                                </div>
+                                <div class="row" ng-if="budget.lastSum">
+                                    <div class="col-12">
+                                        Letzte Gesamtsumme: {{budget.lastSum | number}} €
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <a href class="btn btn-link text-center w-100" ng-click="vm.goToDetails(budget.budgetId)">Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>

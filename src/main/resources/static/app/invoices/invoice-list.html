@@ -1,0 +1,114 @@
+<!--
+  ~ NextBill server application
+  ~
+  ~ @author Michael Roedel
+  ~ Copyright (c) 2020 Michael Roedel
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div class="content">
+    <header class="mb-3">
+        <h2 class="header__title">
+            <i class="fas fa-fw fa-balance-scale-left"></i>
+            Rechnungen
+        </h2>
+    </header>
+    <div>
+        <div class="row">
+            <div class="d-xl-none col-12 mb-3">
+                <button type="button" class="btn btn-outline-secondary w-100" data-toggle="collapse" data-target="#searchConfigurationPart">Suchfilter</button>
+                <div id="searchConfigurationPart" class="collapse">
+                    <ms-search-configuration ms-start-search="vm.startSearch">
+                    </ms-search-configuration>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mb-3">
+                <div class="float-right">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-primary" ng-click="vm.setCorrectionStatusForSelection();" ng-disabled="vm.selected.length == 0" ng-if="vm.viewMode('CHECK')"><span class="fa fa-thumbs-up"></span></button>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-outline-secondary d-none d-xl-block" ng-click="vm.toggleExportView();"  ng-if="vm.viewMode('READY')">Export CSV</button>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-outline-secondary d-none d-xl-block" ng-click="vm.toggleFilterView();">Filter</button>
+                    </div>
+                </div>
+                <div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-primary d-none d-xl-block" ng-click="vm.newExpense();">Ausgabe</button>
+                        <button type="button" class="btn btn-primary d-none d-xl-block" ng-click="vm.newIncome();">Einnahme</button>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-primary d-xl-none" context-menu="vm.otherMenuOptions" context-menu-on="click">Neu</button>
+                        <button type="button" class="btn btn-secondary d-xl-none" ng-click="vm.refreshInvoices();"><i class="fas fa-sync-alt invoice-list__menu-button"></i></button>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-secondary d-none d-xl-block" ng-click="vm.refreshInvoices();"><i class="fas fa-sync-alt invoice-list__menu-button"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row my-3" ng-if="vm.showCsvExport">
+            <div class="col-12">
+                <div class="invoice-edit__csv-export p-3 rounded">
+                    Ihre CSV (=Komma getrennte) Textdatei  wird entsprechend den Suchkriterien erstellt.<br/>
+                    <a ng-href="{{vm.getCsvExportUrl()}}" target="_blank">Download CSV</a>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <main ng-class="vm.toggleFilter ? 'col-12 col-xl-9' : 'col-12'">
+
+                <ul class="nav nav-tabs">
+                    <li class="nav-item"><a href data-toggle="tab" data-target="#checkList" ng-click="vm.setViewMode('CHECK')" ng-class="vm.viewMode('CHECK') ? 'active nav-link' : 'nav-link'">Offen</a></li>
+                    <li class="nav-item"><a href data-toggle="tab" data-target="#readyList" ng-click="vm.setViewMode('READY')" ng-class="vm.viewMode('READY') ? 'active nav-link' : 'nav-link'">Überprüft</a></li>
+                </ul>
+
+                <div class="mx-auto my-5" ng-if="vm.invoiceServiceLoading()">
+                    <div class="loader loader__small"></div>
+                </div>
+
+                <section class="tab-content m-0">
+                    <div id="checkList" ng-class="vm.viewMode('CHECK') ? 'tab-pane active' : 'tab-pane'">
+                        <ms-invoice-table ms-invoices="vm.getInvoices('CHECK')" ms-selected="vm.selected" ms-use-selection="true" ms-read-only="true"></ms-invoice-table>
+                    </div>
+                    <div id="readyList"  ng-class="vm.viewMode('READY') ? 'tab-pane active' : 'tab-pane'">
+                        <div ng-repeat="groupedInvoices in vm.getInvoices('READY') | orderBy:'-dateOfInvoice'" ng-if="!vm.invoiceServiceLoading()">
+                            <div  class="my-3"><h3 class="d-inline">{{groupedInvoices.groupLabel}}</h3> - <h5 class="d-inline">{{groupedInvoices.groupSum}} €</h5></div>
+                            <ms-invoice-table ms-invoices="groupedInvoices.items" ms-selected="vm.selected" ms-use-selection="false" ms-read-only="true" ms-detail-view-id="vm.detailViewId" ms-table-view-id="groupedInvoices.groupLabel"></ms-invoice-table>
+                        </div>
+                        <div class="text-center my-3 w-100" ng-if="!vm.invoiceServiceLoading()">
+                            <button type="button" class="btn btn-outline-secondary w-50" ng-click="vm.showMoreReadyList();vm.isLoadingReadyList = true;">Weiteren Monat laden</button>
+                            <div class="mx-auto my-5" ng-if="vm.isLoadingReadyList">
+                                <div class="loader loader__small"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+            <aside ng-class="vm.toggleFilter ? 'd-none d-xl-block col-xl-3' : 'd-none'">
+                <div class="row">
+                    <div class="col-12">
+                        <ms-search-configuration ms-start-search="vm.startSearch">
+                        </ms-search-configuration>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+</div>

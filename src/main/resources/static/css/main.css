@@ -1,0 +1,385 @@
+/*
+ * NextBill server application
+ *
+ * @author Michael Roedel
+ * Copyright (c) 2020 Michael Roedel
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*** general ***/
+
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+    display: none !important;
+}
+
+.content header{
+    margin-bottom:20px;
+}
+
+.file-drop-zone{
+    background-color: #e1e1e1;
+    text-align: center;
+    font-size: 1.2em;
+    padding: 50px;
+}
+
+/*** detail views menu items ***/
+
+.details-view__file-input-label {
+    color:#5e5e5e;
+    cursor: pointer;
+}
+
+.details-view__file-input-label:hover {
+    color:#4e73df;
+    text-decoration: none;
+}
+
+.details-view__file-input-label__font-size {
+    font-size:2.2em !important;
+}
+
+a.details-view__menu-item:link, a.details-view__menu-item:visited {
+    color:#5e5e5e;
+
+}
+
+a.details-view__menu-item:hover {
+    color:#4e73df;
+    text-decoration: none;
+}
+
+a.details-view__menu-item__font-size {
+    font-size:2.2em !important;
+}
+
+/*** search component ***/
+
+.search-component {
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid white;
+}
+.search-component__overall__bg-color {
+    background-color: #ceddeb;
+}
+
+.search-component__month__bg-color {
+    background-color: #d8cbb5;
+}
+
+/*** billing ***/
+
+.billing_create {
+    background-color: #ededed;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid white;
+}
+
+.billing-create__pay-button {
+    font-size: 1.3rem;
+}
+
+.billing-details__info__bg-color {
+    background-color:#bbe5b3;
+}
+
+.billing-details__danger-hint-sum__bg-color {
+    background-color:#e7a49d;
+}
+
+.billing-details__actions__bg-color {
+    background-color:#b5d4e7;
+}
+
+.billing-process__new__bg-color {
+    background-color:#f7e0bc;
+}
+
+.billing-process__item__bg-color {
+    background-color:#cfdeff;
+}
+
+/*** budget list  ***/
+
+.budget-list__item {
+    background-color:#f4eacf;
+    width: 350px;
+}
+
+/*** budget edit ***/
+
+.budget-edit__table {
+    overflow-y: unset;
+    overflow-x: unset;
+}
+
+.budget-edit__remove-column {
+    width:150px;
+    cursor: pointer;
+}
+
+.budget-edit__add-button {
+    width:150px;
+}
+
+/*** setup ***/
+
+.setup-edit__overall-settings__border-color {
+    border-color: #3f5f9a
+}
+
+
+/*** analysis view ***/
+
+.analysis-view__key-indicator__bg-color {
+    background-color: rgba(135, 135, 135, 0.44);
+}
+
+.analysis-view__key-value-indicator__bg-color {
+    background-color:#b1afb2;
+}
+
+.analysis-view__chart__size {
+    height:300px;
+    width: 500px;
+}
+
+/*** invoice edit ***/
+
+.invoice-edit__article-header {
+    background-color: #ebddd5;
+}
+
+.invoice-edit__cost-payer-hint {
+    background-color:#cab4a3;
+    border:2px solid #665e4f;
+}
+
+.invoice-edit__csv-export {
+    background-color: #e4e4e4;
+}
+
+.invoice-edit__error-hint {
+    background-color:#ca9b90;
+    border:2px solid #665e4f;
+}
+
+.invoice-edit__standing-order {
+    background-color:#c1cad5;
+    border:2px solid #665e4f;
+}
+
+.invoice-edit__payment-button-paid {
+    background-color: rgba(164,255,213,0.85);
+}
+
+.invoice-edit__payment-button-not-paid {
+    background-color: rgba(255,213,205,0.85);
+}
+
+.invoice-edit__cost-dist-table-paid-column {
+    width:200px;
+}
+
+.invoice-edit__table {
+    overflow-y: unset;
+    overflow-x: unset;
+}
+
+/*** invoice summary ***/
+
+.invoice-summary {
+    background-color: transparent;
+}
+
+/*** invoice list ***/
+
+.invoice-list__menu-button {
+    font-size: 1.1em;
+    vertical-align: middle;
+}
+
+/*** invoice table ***/
+
+.invoice-table__checkbox {
+    font-size:1.3em;
+    cursor: pointer
+}
+
+.invoice-table__sum-column__color {
+    color: #47a046;
+}
+
+.invoice-table__sum-small__font-size {
+    font-size: 0.8rem;
+}
+
+.invoice-table__invoice-summary_bg-color {
+    background-color: #c0cbd4;
+}
+
+/*** payment person dialog ***/
+
+.payment-person-dialog__add-item {
+    background-color:burlywood;
+}
+
+/*** payment person dialog ***/
+
+.user-list__rights__width {
+    width: 300px;
+}
+
+/*** standing order list ***/
+
+.standing-order__menu-item {
+    font-size: 1.1em;
+    vertical-align: middle;
+}
+
+/*** article select dialog ***/
+
+.article-select__sum-part {
+    position: absolute;
+    height: 40px;
+    width: 96%;
+    left: 3%;
+    top: 80%;
+    text-align: right;
+}
+
+.article-select__list {
+    overflow: auto;
+    height: 80%;
+}
+
+
+.article-select__remove-button {
+    cursor: pointer;
+}
+
+.article-select__sum-loader {
+    width:15px !important;;
+    height:15px !important;;
+}
+
+/*** date component ***/
+
+.moment-picker {
+    z-index:1070 !important;
+}
+
+input[type=date]::-webkit-inner-spin-button,
+input[type=date]::-webkit-outer-spin-button,
+input[type="date"]::-webkit-calendar-picker-indicator {
+    display:none;
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/*** view headers general ***/
+
+.header__title {
+    display:inline;
+    vertical-align: middle;
+}
+
+.header__title a {
+    text-decoration: none;
+}
+
+/*** app messages ***/
+
+.app-message {
+    padding: 14px 24px;
+    border-radius: 2px;
+    box-sizing: border-box;
+    min-height: 48px;
+    min-width: 288px;
+    max-width: 568px;
+    color: white;
+    background-color: #323232;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.notifications {
+    position: fixed;
+    margin: 0;
+    padding: 0;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    list-style: none;
+    pointer-events: none;
+    user-select: none;
+    z-index: 8;
+}
+
+.app-messages__item {
+    margin: 16px auto 0;
+}
+
+/*** loader/spinner ***/
+
+.loader__small {
+    width:70px !important;
+    height:70px !important;
+}
+
+.loader {
+    border: 12px solid #f3f3f3; /* Light grey */
+    border-top: 12px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.letter {
+    display: inline-block;
+    animation: infinite breathe 4s;
+    transform: translateZ(0);
+}
+.letter:nth-of-type(1),
+.letter:nth-of-type(10) {
+    animation-delay: 0.3s;
+}
+.letter:nth-of-type(2),
+.letter:nth-of-type(9) {
+    animation-delay: 0.225s;
+}
+.letter:nth-of-type(3),
+.letter:nth-of-type(8) {
+    animation-delay: 0.15s;
+}
+.letter:nth-of-type(4),
+.letter:nth-of-type(7) {
+    animation-delay: 0.075s;
+}
+
+@keyframes breathe {
+    50% {
+        transform: scale(0.75, 0.75);
+        color: rgba(0, 0, 0, 0.05);
+    }
+}

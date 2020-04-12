@@ -1,0 +1,64 @@
+<!--
+  ~ NextBill server application
+  ~
+  ~ @author Michael Roedel
+  ~ Copyright (c) 2020 Michael Roedel
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div class="content">
+    <header>
+        <h2 class="header__title">
+            <i class="fas fa-user-cog"></i>
+            Profil
+        </h2>
+    </header>
+    <div class="row justify-content-center">
+        <div class="col-6">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <label for="appUserName">Name</label>
+                    <input type="text" class="form-control" id="appUserName" placeholder="Michael"
+                           ng-model="vm.currentUser.appUserName">
+                </div>
+
+                <div class="form-group">
+                    <label for="mail">E-Mail - Zum Ändern bitte Administrator benachrichtigen</label>
+                    <input type="email" class="form-control" id="mail" placeholder="name@example.com" disabled
+                           ng-model="vm.currentUser.email">
+                </div>
+
+                <div class="form-group">
+                    <label for="paypalName">PayPal.me Name</label>
+                    <input type="text" class="form-control" id="paypalName" placeholder="Mueller32"
+                           ng-model="vm.currentUser.paypalName">
+                </div>
+
+                <div class="row w-100 m-0 p-0">
+                    <div class="col-6 p-0">
+                        <div class="form-group p-0" ng-if="vm.mailSendEnabled">
+                            <span class="btn btn-primary" ng-click="vm.sendPasswordResetMail()">Passwort ändern (per E-Mail)</span>
+                        </div>
+                    </div>
+                    <div class="col-6 text-right p-0">
+                        <div class="form-group">
+                            <span class="btn btn-success" ng-click="vm.submitForm()">Speichern</span>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

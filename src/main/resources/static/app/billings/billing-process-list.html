@@ -1,0 +1,139 @@
+<!--
+  ~ NextBill server application
+  ~
+  ~ @author Michael Roedel
+  ~ Copyright (c) 2020 Michael Roedel
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div class="content">
+    <header>
+        <h2 class="header__title">
+            <i class="fas fa-fw fa-file-invoice-dollar"></i>
+            Abrechnungen
+        </h2>
+    </header>
+    <main>
+        <div class="row">
+            <div class="col-12">
+                <div class="w-100">
+                    <div>
+                        <input type="checkbox" id="customSwitches"
+                               ng-model="vm.useArchived"
+                               ng-change="vm.refreshArchived();vm.listBillingProcesses()">
+                        <label for="customSwitches">Zeige archivierte Abrechnungen</label>
+                    </div>
+                </div>
+                <div class="mx-auto mt-5" ng-if="vm.billingServiceLoading()">
+                    <div class="loader loader__small"></div>
+                </div>
+                <div ng-if="!vm.billingServiceLoading()" ng-repeat="groupedBillingListItem in vm.getGroupedBillingListItems()">
+                    <div class="row" ng-if="(vm.showBillingPaidPart(groupedBillingListItem) || (groupedBillingListItem.billingListItemDTO && vm.showSumToBeChecked(groupedBillingListItem.billingListItemDTO))) || vm.getBillingListProcessItems(groupedBillingListItem).length > 0">
+                        <div class="col-12">
+                            <h3>{{groupedBillingListItem.costPayer.payerName}}</h3>
+                            <div class="p-3 mb-3 rounded billing-process__new__bg-color" ng-if="vm.showBillingPaidPart(groupedBillingListItem) || (groupedBillingListItem.billingListItemDTO && vm.showSumToBeChecked(groupedBillingListItem.billingListItemDTO))">
+                                <div class="d-none d-md-block">
+                                    <div class="row">
+                                        <div class="col-10 text-left">
+                                            <h5 class="d-inline-block" ng-if="vm.showBillingPaidPart(groupedBillingListItem)"><b>Differenzbetrag:</b> {{groupedBillingListItem.billingListItemDTO.sumToBePaid | number}} €</h5>
+                                            <div ng-if="vm.showSumToBeChecked(groupedBillingListItem.billingListItemDTO)"><b>Noch vom Transaktionspartner zu prüfende Differenzsumme:</b> {{groupedBillingListItem.billingListItemDTO.sumToBeChecked | number}} €
+                                                [<a href ng-click="vm.checkReminderMessage(groupedBillingListItem.costPayer.paymentPersonId)">Erinnern</a>]
+                                            </div>
+                                            <div ng-if="vm.showBillingPaidPart(groupedBillingListItem)">
+                                                <i class="fa fa-info-circle"></i> Die Balance zwischen Ihnen und {{groupedBillingListItem.costPayer.payerName}} ist unausgeglichen!
+                                            </div>
+                                        </div>
+                                        <div class="col-2" ng-if="vm.showBillingPaidPart(groupedBillingListItem)">
+                                            <i class="btn btn-primary float-right" ng-click="vm.createBilling(groupedBillingListItem.billingListItemDTO);">Abrechnen</i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-md-none">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <h5 class="d-inline-block" ng-if="vm.showBillingPaidPart(groupedBillingListItem)"><b>Differenzbetrag:</b> {{groupedBillingListItem.billingListItemDTO.sumToBePaid | number}} €</h5>
+                                            <div ng-if="vm.showSumToBeChecked(groupedBillingListItem.billingListItemDTO)"><b>Noch vom Transaktionspartner zu prüfende Differenzsumme:</b> {{groupedBillingListItem.billingListItemDTO.sumToBeChecked | number}} €</div>
+                                            <div ng-if="vm.showBillingPaidPart(groupedBillingListItem)">
+                                                <i class="fa fa-info-circle"></i> Die Balance zwischen Ihnen und {{groupedBillingListItem.costPayer.payerName}} ist unausgeglichen!
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-md-none">
+                                    <div class="row">
+                                        <div class="col-12 text-center" ng-if="vm.showBillingPaidPart(groupedBillingListItem)">
+                                            <span class="btn btn-primary w-100" ng-click="vm.createBilling(groupedBillingListItem.billingListItemDTO);">Abrechnen</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div ng-repeat="billingProcess in vm.getBillingListProcessItems(groupedBillingListItem)">
+                                <div class="d-inline float-left ml-2 mt-2 p-3 rounded billing-process__item__bg-color">
+                                    <div class="row">
+                                        <div class="col-12 text-center">
+                                            {{billingProcess.createdDate | date: 'dd. MMMM yyyy'}}
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12 text-center">
+                                            {{billingProcess.sumToPay | number}} € <i class="fa fa-exclamation-circle text-danger" ng-if="vm.showCanBeCompensatedWarning(billingProcess)" title="Summe hat sich geändert!"></i>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12 text-center">
+                                            <h4>{{billingProcess.subject}}</h4>
+                                        </div>
+                                    </div>
+                                    <div class="row" ng-if="billingProcess.messageType === 'TO_PAY' || billingProcess.messageType === 'PAID' || billingProcess.messageType === 'PAYMENT_CONFIRMED' || billingProcess.messageType === 'WAIT_FOR_PAYMENT'">
+                                        <div class="col-12">
+                                            <span class="btn btn-primary w-100" ng-if="billingProcess.messageType === 'TO_PAY'" ng-click="vm.firstAction(billingProcess)">Zahlung ausgeführt</span>
+                                            <span class="btn btn-primary w-100" ng-if="billingProcess.messageType === 'PAID'" ng-click="vm.firstAction(billingProcess)">Zahlung erhalten</span>
+                                            <span class="btn btn-primary w-100" ng-if="billingProcess.messageType === 'WAIT_FOR_PAYMENT'" ng-click="vm.firstAction(billingProcess)">Zahlung erhalten</span>
+                                            <span class="btn btn-primary w-100" ng-if="billingProcess.messageType === 'PAYMENT_CONFIRMED'" ng-click="vm.firstAction(billingProcess)">Abrechnung abschließen</span>
+                                        </div>
+                                    </div>
+                                    <div class="row" ng-if="billingProcess.messageType === 'TO_PAY' || billingProcess.messageType === 'WAIT_FOR_PAYMENT'">
+                                        <div class="col-12">
+                                            <span class="btn btn-danger w-100" ng-if="billingProcess.messageType === 'TO_PAY' || billingProcess.sumToPay === 0" ng-click="vm.secondAction(billingProcess)">Stornieren</span>
+                                            <span class="btn btn-danger w-100" ng-if="billingProcess.messageType === 'WAIT_FOR_PAYMENT' || billingProcess.sumToPay === 0" ng-click="vm.secondAction(billingProcess)">Stornieren</span>
+                                        </div>
+                                    </div>
+                                    <div class="row" ng-if="billingProcess.messageType === 'PAYMENT_CONFIRMED' || billingProcess.messageType === 'FINISHED' || billingProcess.messageType === 'ARCHIVED' ">
+                                        <div class="col-12">
+                                            <span class="btn btn-primary w-100" ng-if="billingProcess.messageType !== 'ARCHIVED'" ng-click="vm.archiveBilling(billingProcess)">Archivieren</span>
+                                            <span class="btn btn-danger w-100" ng-if="billingProcess.messageType === 'ARCHIVED'" ng-click="vm.secondAction(billingProcess)">Löschen</span>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <a class="btn btn-link w-100 text-center" ng-href="{{vm.getBillingReportUrl(billingProcess)}}">Rechnung<br/>herunterladen</a>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <a href class="btn btn-link w-100 text-center" ng-click="vm.goToDetails(billingProcess)">Details</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>

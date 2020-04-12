@@ -1,0 +1,138 @@
+<!--
+  ~ NextBill server application
+  ~
+  ~ @author Michael Roedel
+  ~ Copyright (c) 2020 Michael Roedel
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div class="search-component search-component__overall__bg-color">
+    <p>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xl-12 col-sm-6">
+                <h6>Einnahme</h6>
+                <div>
+                    <input type="checkbox" ng-change="vm.startSearch()" ng-model="vm.getSearchConfiguration().incomeMainFunctionEnum">
+                </div>
+            </div>
+            <div class="col-xl-12 col-sm-6">
+                <h6>Ausgabe</h6>
+                <div>
+                    <input type="checkbox" ng-change="vm.startSearch()" ng-model="vm.getSearchConfiguration().expenseMainFunctionEnum">
+                </div>
+            </div>
+            <div class="col-xl-12 col-sm-6">
+                <h6>Geldgeber</h6>
+                <div>
+                    <ms-paymentperson-select ms-callback-payment-person="vm.setPayerPerson"
+                                             ms-current-selection="vm.getPayerPersonSelection()"
+                                             ms-dialog-id="vm.payerPersonSearchConfiguration">
+                    </ms-paymentperson-select>
+                </div>
+            </div>
+            <div class="col-xl-12 col-sm-6">
+                <h6>Zahlungsempfänger</h6>
+                <div>
+                    <ms-paymentperson-select ms-callback-payment-person="vm.setPaymentRecipientPerson"
+                                             ms-current-selection="vm.getPaymentRecipientPersonSelection()"
+                                             ms-dialog-id="vm.paymentRecipientPersonSearchConfiguration">
+                    </ms-paymentperson-select>
+                </div>
+            </div>
+
+            <div class="col-xl-12 col-sm-6">
+                <h6>Kategorie</h6>
+                <div>
+                    <ms-invoicecategorie-select ms-return-invoice-category="vm.selectInvoiceCategory"
+                                                ms-current-selection="vm.getSearchConfiguration().invoiceCategoryDTO"
+                                                ms-dialog-id="vm.invoiceCategorySearchConfiguration">
+                    </ms-invoicecategorie-select>
+                </div>
+            </div>
+            <div class="col-xl-12 col-sm-6">
+                <h6>Zeitraum</h6>
+                <div>
+                    <ms-input-date ms-value="vm.getSearchConfiguration().startDate" dense="true" ms-on-change="vm.startSearch()"></ms-input-date>
+                </div>
+                <div>
+                    <ms-input-date ms-value="vm.getSearchConfiguration().endDate" dense="true" ms-on-change="vm.startSearch()"></ms-input-date>
+                </div>
+            </div>
+
+            <div class="col-xl-12 col-sm-6">
+                <h6>Träger</h6>
+                <div>
+                    <ms-paymentperson-select ms-callback-payment-person="vm.setCostPayer"
+                                             ms-current-selection="vm.getCostPayerSelection()"
+                                             ms-hide-business-partners="true"
+                                             ms-dialog-id="vm.costPayerSearchConfiguration">
+                    </ms-paymentperson-select>
+                </div>
+            </div>
+            <div class="col-xl-12 col-sm-6">
+                <h6>Kostenverteilung</h6>
+                <div>
+                    <select name="repeatSelectSearchConfiguration" class="form-control w-100" ng-change="vm.repairSearchConfiguration();vm.startSearch()" ng-model="vm.getSearchConfiguration().costDistributionId">
+                        <option value="">
+                            Keine Auswahl
+                        </option>
+                        <option ng-repeat="costDistribution in vm.getCostDistributions()"
+                                value="{{costDistribution.costDistributionId}}">
+                            {{costDistribution.name}}
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-xl-12 col-sm-6">
+                <h6>Sonderfälle</h6>
+                <div>
+                    <select name="repeatSelectSearchConfiguration" class="form-control w-100" ng-model="vm.getSearchConfiguration().specialType" ng-change="vm.repairSearchConfiguration();vm.startSearch()">
+                        <option ng-repeat="booleanSelection in vm.booleanSelections"
+                                value="{{booleanSelection.enumName}}">
+                            {{booleanSelection.displayName}}
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-xl-12 col-sm-6">
+                <h6>Bezugsraum</h6>
+                <div>
+                    <select name="repeatSelectSearchConfiguration" class="form-control w-100" ng-model="vm.getSearchConfiguration().repetitionTypeEnum" ng-change="vm.repairSearchConfiguration();vm.startSearch()">
+                        <option ng-repeat="repetionTypeEnum in vm.repetitionTypeEnums"
+                                value="{{repetionTypeEnum.enumName}}">
+                            {{repetionTypeEnum.displayName}}
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-xl-12 col-sm-12">
+                <h6>Bemerkung</h6>
+                <div>
+                    <input type="text" class="search__input form-control" placeholder="Küche, #Urlaub, ..." ng-model="vm.remarksInput" ng-change="vm.remarksInputDone()" />
+                </div>
+            </div>
+            <div class="col-xl-12 col-sm-12">
+                <h6>OCR-Volltextsuche</h6>
+                <div>
+                    <input type="text" class="search__input form-control" placeholder="Möhren, Müllerstraße, Rabatt, ..." ng-model="vm.fullTextInput" ng-change="vm.fullTextInputDone()" />
+                </div>
+            </div>
+        </div>
+</div>
+    </p>
+
+</div>

@@ -1,0 +1,81 @@
+server:
+  port: 8010
+  tomcat:
+    remote-ip-header: x-forwarded-for
+    protocol_header: x-forwarded-proto
+    uri-encoding: UTF-8
+
+build:
+  version: "@project.version@"
+  breakingChangesForAndroid:
+
+settings:
+  folderName: "nextbill"
+
+spring:
+  flyway:
+    enabled: true
+  aop:
+    proxy-target-class: true
+  jackson:
+    serialization:
+      write-dates-as-timestamps: true
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  thymeleaf:
+    encoding: UTF-8
+  datasource:
+    url: jdbc:h2:file:./nextbill;DB_CLOSE_ON_EXIT=FALSE
+    username: user
+    password: nextBillStandardPass1
+    driver-class-name: org.h2.Driver
+  h2:
+    console:
+      enabled: true
+      path: /console
+  jpa:
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    database-platform: org.hibernate.dialect.PostgreSQL94Dialect
+    properties:
+      hibernate:
+        format_sql: true
+        show-sql: true
+        jdbc:
+          lob:
+            non_contextual_creation: true
+
+external:
+  service:
+    scansio:
+      url: https://api.scansio.de/scan/v1/
+
+security:
+  xsrfTokenName: MS-X-XSRF-TOKEN
+  androidClientSecret: defaultNextBillSecret
+
+internal:
+  firebaseToken: ""
+  paths:
+    invoices: "invoices/images/"
+    billings: "billings/"
+    temp: "temp/"
+    apkFile: "/opt/nextbill/downloads/nextbill.apk"
+
+logging:
+  level:
+    de.nextbill.domain.service: info
+    org.springframework.security: info
+    org.springframework.web: info
+    org.hibernate.SQL: info
+
+jobs:
+  StandingOrderScheduler: 0 0 1 * * ?
+  StatisticScheduler: 0 0 3 * * ?
+  EMailImportScheduler: 0 1/4 * ? * *
+  BusinessPartnerPublicScheduler: 0 0 2 * * ?

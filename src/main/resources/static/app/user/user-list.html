@@ -1,0 +1,137 @@
+<!--
+  ~ NextBill server application
+  ~
+  ~ @author Michael Roedel
+  ~ Copyright (c) 2020 Michael Roedel
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div class="content">
+    <header>
+        <div class="row">
+            <div class="col-7">
+                <h2 class="header__title">
+                    <i class="fas fa-users"></i>
+                    Benutzerverwaltung
+                </h2>
+            </div>
+            <div class="col-5 text-right">
+                <a href class="details-view__menu-item details-view__menu-item__font-size mr-1" ng-click="vm.addUser()">
+                    <i class="fas fa-user-plus"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="row justify-content-center">
+        <div class="col-10">
+            <table class="table table-hover" ng-if="!vm.invoiceServiceLoading()">
+                <thead class="w-100">
+                <tr>
+                    <th>Aktiviert</th>
+                    <th>Name</th>
+                    <th>E-Mail</th>
+                    <th>Passwort</th>
+                    <th class="user-list__rights__width">Rechte</th>
+                    <th> </th>
+                </tr>
+                </thead>
+                <tbody class="w-100">
+                <tr ng-repeat="user in vm.users">
+                    <td>
+                        <input type="checkbox" ng-model="user.enabled" ng-disabled="!user.editable">
+                    </td>
+                    <td>
+                        <input type="text" class="form-control" ng-model="user.appUserName" ng-if="user.editable">
+                        <span ng-if="!user.editable">{{user.appUserName}}</span>
+                    </td>
+                    <td>
+                        <input type="email" class="form-control" ng-model="user.email" ng-if="user.editable">
+                        <span ng-if="!user.editable">{{user.email}}</span>
+                    </td>
+                    <td>
+                        <span ng-if="!user.editable">***</span>
+                        <div ng-if="user.editable && !user.passwordEdit">
+                            <a href="" ng-click="user.passwordEdit = true">Passwort setzen</a><br/>
+                            <a href="" ng-click="vm.sendPassword(user.email)" ng-click="" ng-if="user.email">Passwort-Reset per E-Mail</a>
+                        </div>
+                        <div ng-if="user.passwordEdit">
+                            <input type="password" class="form-control" ng-model="user.appUserPassword" ng-if="user.editable">
+                        </div>
+                    </td>
+                    <td class="user-list__rights__width">
+                        <div>
+                            <input type="checkbox" ng-model="user.useAndroid" ng-disabled="!user.editable" id="useAndroid">
+                            <label for="useAndroid">Nutzung Android-App</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" ng-model="user.useOcr" ng-disabled="!vm.scansioEnabled || !user.editable" id="scansioEnabled">
+                            <label for="scansioEnabled">OCR-Analyse (Scansio)</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" ng-model="user.editUsers" ng-disabled="!user.editable" id="editUsers">
+                            <label for="editUsers">Verwaltung der Benutzer</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" ng-model="user.editSettings" ng-disabled="!user.editable" id="editSettings">
+                            <label for="editSettings">Konfiguration ändern</label>
+                        </div>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-outline-secondary" ng-click="user.editable = true" ng-if="!user.editable"><i class="fas fa-user-edit"></i></button>
+                        <button type="button" class="btn btn-outline-primary" ng-click="user.editable = false; vm.updateUser(user)" ng-if="user.editable"><i class="far fa-save"></i></button>
+                        <button type="button" class="btn btn-outline-danger" ng-click="vm.showDeleteUserDialog(user)" ng-if="user.editable && !user.new"><i class="fas fa-trash"></i></button>
+                        <button type="button" class="btn btn-outline-primary mt-1" ng-click="vm.lockUser(user);" ng-if="user.editable"><i class="fas fa-times"></i></button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="passwordResetModalDialog" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Passwort Key</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    Da der Mail-Service nicht konfiguriert wurde, erhalten Sie nachfolgend den Passwort-Wiederherstellungs-Key,
+                    den Sie dem betreffenden Benutzer weitergeben können.<br/><br/>
+                    Der Passwort-Wiederherstellungs Key lautet:<br/><b>{{vm.key}}</b>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="userDeleteModalDialog" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Benutzer löschen</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <b>Möchten Sie den Benutzer {{vm.userToDelete.appUserName}} wirklich löschen?</b><br/><br/>
+                    Die Abrechnungen mit diesem Benutzer bleiben erhalten, als Name wird "Gelöscht" angezeigt.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" ng-click="vm.deleteUser(vm.userToDelete)">Löschen</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Abbrechen</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,473 @@
+<!--
+  ~ NextBill server application
+  ~
+  ~ @author Michael Roedel
+  ~ Copyright (c) 2020 Michael Roedel
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<main class="content" nv-file-over="" nv-file-drop="" uploader="vm.uploader">
+    <header>
+        <div class="row">
+            <div class="col-7">
+                <h2 class="header__title">
+                    <a href ng-click="vm.goToOverview()">
+                        <i class="fa fa-arrow-circle-left"></i>
+                    </a>
+                    Details
+                </h2>
+                <h5>
+                    <a href ng-click="vm.submitForm()" ng-if="vm.areChanges()">Speichern und zurück</a>
+                    <a href ng-click="vm.submitForm()" ng-if="!vm.areChanges()">Zurück</a>
+                </h5>
+            </div>
+
+            <div class="col-5 text-right" ng-if="!vm.isReadOnlyMode()">
+                <a href class="details-view__menu-item details-view__menu-item__font-size mr-1" ng-if="vm.invoice.invoiceWorkflowMode === 'CREATED_USER_READY_MODE' || vm.invoice.invoiceWorkflowMode === 'EXTERNAL_USER_READY_MODE'" ng-click="vm.setCorrectionStatus('CHECK')">
+                    <i class="fa fa-unlock"></i>
+                </a>
+                <a href class="details-view__menu-item details-view__menu-item__font-size mr-1" ng-click="vm.repeatAnalysis()" ng-if="vm.hasInvoiceImageValue && vm.hasScanRight">
+                    <i class="fas fa-magic"></i>
+                </a>
+                <a href class="details-view__menu-item details-view__menu-item__font-size mr-1" ng-click="vm.resetInvoice()" ng-if="vm.areChanges()">
+                    <i class="fa fa-undo"></i>
+                </a>
+                <a href class="details-view__menu-item details-view__menu-item__font-size mr-1" ng-if="!vm.isStandingOrder && !vm.invoice.standingOrderInvoiceTemplateId" data-toggle="modal" data-target="#standingOrderModalDialog">
+                    <i class="fas fa-sync"></i>
+                </a>
+                <span class="mr-1" ng-if="!vm.hasInvoiceImageValue && !vm.imagePreview">
+                    <label for="file-input">
+                        <div href class="details-view__file-input-label details-view__file-input-label__font-size"><i class="fas fa-camera-retro"></i></div>
+                    </label>
+                    <div class="d-none">
+                        <input id="file-input" type="file" nv-file-select="" uploader="vm.uploader" ng-click="vm.removeImage()"/>
+                    </div>
+                </span>
+                <a href class="details-view__menu-item details-view__menu-item__font-size mr-1" ng-click="vm.removeImage()" ng-if="vm.hasInvoiceImageValue || vm.imagePreview">
+                    <i class="fas fa-camera-retro"></i>
+                </a>
+                <a href class="details-view__menu-item details-view__menu-item__font-size" context-menu="vm.deleteConfirmationMenu" context-menu-on="click">
+                    <i class="far fa-trash-alt"></i>
+                </a>
+            </div>
+
+            <div id="standingOrderModalDialog" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Dauerauftrag</h4>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-5">Startdatum</div>
+                                <div class="col-7"><ms-input-date ms-value="vm.standingOrder.startDate" dense="true" ms-disabled="vm.isReadOnlyMode()"></ms-input-date></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-5">Häufigkeit</div>
+                                <div class="col-7">
+                                    <select name="repeatSelect" class="form-control w-100" ng-model="vm.standingOrder.repetitionTypeEnum">
+                                        <option value="">Bitte wählen</option>
+                                        <option ng-repeat="repetionTypeEnum in vm.repetionTypeEnums"
+                                                value="{{repetionTypeEnum.name}}">
+                                            {{repetionTypeEnum.displayName}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <button type="button" class="btn btn-primary w-100" data-dismiss="modal" ng-click="vm.generateStandingOrder()">Erstellen</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div>
+        <div class="row" ng-if="vm.invoice.invoiceWorkflowMode === 'EXTERNAL_USER_CHECK_MODE' || vm.invoice.invoiceWorkflowMode === 'EXTERNAL_USER_READY_MODE'">
+            <div class="col-12">
+                <div class="invoice-edit__cost-payer-hint p-3 my-3">
+                    <b>Diese Rechnung ist von einem anderen Benutzer ({{vm.invoice.createdByDTO.displayName}}). Sie kann daher nicht bearbeitet werden!</b>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" ng-if="vm.invoice.invoiceFailureMessage != null">
+            <div class="col-12">
+                <div class="invoice-edit__error-hint p-3 my-3">
+                    <b>{{vm.invoice.invoiceFailureMessage}}</b>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" ng-if="vm.isStandingOrder">
+            <div class="col-12">
+                <div class="invoice-edit__standing-order p-3 mb-4 rounded">
+                    <h5>Konfiguration Dauerauftrag</h5>
+                    <div class="row">
+                        <div class="col-12 col-md-7">
+                            <div class="row">
+                                <div class="col-5"><b>Startdatum</b></div>
+                                <div class="col-7"><ms-input-date ms-value="vm.standingOrder.startDate" ms-set-null="false" required="true" dense="true" ms-disabled="vm.isReadOnlyMode()" ms-on-change="vm.correctDateAndRepetitionForStandingOrder()"></ms-input-date></div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-5">
+                            <div class="row">
+                                <div class="col-5"><b>Häufigkeit</b></div>
+                                <div class="col-7">
+                                    <select name="repeatSelect" class="form-control w-100" ng-model="vm.standingOrder.repetitionTypeEnum" ng-required="true" ng-change="vm.correctDateAndRepetitionForStandingOrder()">
+                                        <option ng-repeat="repetionTypeEnum in vm.repetionTypeEnums"
+                                                value="{{repetionTypeEnum.name}}">
+                                            {{repetionTypeEnum.displayName}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row ms-invoice-details">
+            <div ng-class="vm.hasInvoiceImageValue || vm.imagePreview ? 'col-12 col-xl-8' : 'col-12'">
+                <form name="invoiceForm" ng-submit="invoiceForm.$valid && vm.submitForm()">
+                    <div class="row">
+                        <div class="col-6">
+                            <div ng-if="vm.showPaymentRecipient()">
+                                <h5>Zahlungsempfänger</h5>
+                                <div class="row">
+                                    <div class="col-8">
+                                        <ms-paymentperson-select ms-callback-payment-person="vm.paymentRecipientTransfer"
+                                                                 ms-current-selection="vm.paymentRecipientName"
+                                                                 ms-dialog-id="'addPaymentRecipient'"
+                                                                 disabled="vm.isReadOnlyMode()">
+                                        </ms-paymentperson-select>
+                                    </div>
+                                    <div class="col-4">
+                                        <div ng-if="vm.showPaymentRecipientPaymentPersonHasPaidButton() && !vm.isReadOnlyMode()">
+                                            <a href class="p-1" ng-click="vm.setInvoiceCostPaidStatus(vm.invoice)">
+                                                <i class="fa fa-tachometer"></i><span class="invoice-edit__payment-button-paid p-1" ng-if="vm.invoice.costPaid && vm.invoice.costPaid > 0">BEZAHLT ({{vm.invoice.costPaid}} €)</span><span class="invoice-edit__payment-button-not-paid p-1" ng-if="!vm.invoice.costPaid || vm.invoice.costPaid == 0">UNBEZAHLT</span>
+                                            </a>
+                                        </div>
+                                        <div ng-if="!vm.isReadOnlyMode() && vm.hasInvoiceImageValue && vm.hasScanRight">
+                                            <a class="details-view__menu-item" href ng-click="vm.showArticlesInvoiceDialog()"><i class="fa fa-calculator"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div ng-if="vm.showPayer()">
+                                <h5>Geldgeber</h5>
+                                <div class="row">
+                                    <div class="col-8">
+                                        <ms-paymentperson-select ms-callback-payment-person="vm.payerTransfer"
+                                                                 ms-current-selection="vm.payerName"
+                                                                 ms-dialog-id="'addPayer'"
+                                                                 disabled="vm.isReadOnlyMode()">
+                                        </ms-paymentperson-select>
+                                    </div>
+                                    <div class="col-4">
+                                        <div ng-if="vm.showPayerPaymentPersonHasPaidButton() && !vm.isReadOnlyMode()">
+                                            <a href class="p-1" ng-click="vm.setInvoiceCostPaidStatus(vm.invoice)">
+                                                <i class="fa fa-tachometer"></i><span class="invoice-edit__payment-button-paid p-1" ng-if="vm.invoice.costPaid && vm.invoice.costPaid > 0">BEZAHLT ({{vm.invoice.costPaid}} €)</span><span class="invoice-edit__payment-button-not-paid p-1" ng-if="!vm.invoice.costPaid || vm.invoice.costPaid == 0">UNBEZAHLT</span>
+                                            </a>
+                                        </div>
+                                        <div ng-if="!vm.isReadOnlyMode() && vm.hasInvoiceImageValue && vm.hasScanRight">
+                                            <a class="details-view__menu-item" href ng-click="vm.showArticlesInvoiceDialog()"><i class="fa fa-calculator"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="articlesModalDialogForInvoice" class="modal fade" role="dialog">
+                                <div class="modal-dialog modal-xl">
+                                    <div ng-if="vm.showArticlesDialogForInvoice">
+                                        <div class="modal-content">
+                                            <div class="modal-header invoice-edit__article-header">
+                                                <h4 class="modal-title">Positionen per Klick auswählen</h4>
+                                                <button type="button" class="close" ng-click="vm.hideArticlesInvoiceDialog()">&times;</button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div>
+                                                    <ms-articles-select ms-callback="vm.callbackForArticlesSelectInvoice"
+                                                                        ms-article-dialog-data="vm.selectArticleInvoiceData">
+                                                    </ms-articles-select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <h5>Summe</h5>
+                            <input type="number" class="form-control w-100" ng-model="vm.invoice.sumOfInvoice" step="0.01"
+                                   ng-change="vm.updateCostDistributionItems()" onClick="this.select();" ng-disabled="vm.isReadOnlyMode()"/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <h5 ng-if="!vm.isStandingOrder">Datum</h5>
+                            <h5 ng-if="vm.isStandingOrder">Nächste Ausführung</h5>
+                            <ms-input-date ms-value="vm.invoice.dateOfInvoice" dense="true" ms-disabled="vm.isReadOnlyMode() || vm.isStandingOrder" ms-set-null="false"></ms-input-date>
+                        </div>
+
+                        <div class="col-6">
+                            <h5>Sonderfall</h5>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" ng-model="vm.invoice.specialType" ng-disabled="vm.isReadOnlyMode()"> Aktiv
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <h5>Zahlungsart</h5>
+                            <select name="repeatSelect" class="form-control w-100" ng-model="vm.invoice.paymentTypeEnum" ng-disabled="vm.isReadOnlyMode()">
+                                <option ng-repeat="paymentTypeEnum in vm.paymentTypeEnums"
+                                        value="{{paymentTypeEnum.name}}">
+                                    {{paymentTypeEnum.displayName}}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <h5>Kategorie</h5>
+                            <div ng-if="vm.loadingBarCategory">
+                                <div class="row">
+                                    <div class="col-1 justify-content-end">
+                                        <span class="mx-auto my-2">
+                                            <div class="loader article-select__sum-loader"></div>
+                                        </span>
+                                    </div>
+                                    <div  class="col-11 text-left">
+                                        <span>Kategorie wird ermittelt...</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div ng-if="!vm.loadingBarCategory">
+                                <ms-invoicecategorie-select ms-return-invoice-category="vm.selectInvoiceCategory"
+                                                            ms-current-selection="vm.invoice.invoiceCategoryDTO"
+                                                            ms-dialog-id="'addCategory'"
+                                                            ms-expense-type="vm.invoice.mainFunctionEnum"
+                                                            disabled="vm.isReadOnlyMode()">
+                                </ms-invoicecategorie-select>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h5>Beschreibung</h5>
+                            <textarea rows="2" maxlength="60000" class="form-control w-100" ng-model="vm.invoice.remarks" ng-disabled="vm.isReadOnlyMode()"/>
+                        </div>
+                    </div>
+                    <ms-paymentperson-select ms-callback-payment-person="vm.addCostDistributionItemToList"
+                                             ms-dialog-id="'costdistributionitemadd'" ms-hide-selection-button="true"
+                                             ms-hidden-sel-button-activator="vm.showCostDistributionPaymentPersonDialog"
+                                             ms-hide-business-partners="true"
+                                             disabled="vm.isReadOnlyMode()">
+                    </ms-paymentperson-select>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="table-responsive invoice-edit__table">
+                                <table class="table table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Summe</th>
+                                        <th>
+                                            <div ng-if="!vm.isReadOnlyMode()">
+                                    <a href data-toggle="modal" data-target="#costdistributionitemadd"
+                                          class="context float-right details-view__menu-item" title="Person/Unternehmen hinzufügen"
+                                          ng-click="vm.showCostDistributionPaymentPersonDialog = true" ><i class="fas fa-user-plus"></i></a>
+                                    <a href data-toggle="dropdown" class="context dropdown-toggle float-right details-view__menu-item mr-3"><span class="fa fa-star"></span></a>
+                                    <div class="dropdown-menu float-right p-3">
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <span>
+                                                    <input type="text" class="form-control" ng-model="vm.newCostDistributionName"/>
+                                                    <a href class="float-right" ng-click="vm.createCostDistributionRequest();">Erstellen</a>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <hr class="my-0"/>
+                                        <div class="col-9">
+                                            <a href ng-click="vm.useStandardCostDistribution()">Nur ich</a>
+                                        </div>
+                                        <hr class="my-0" ng-if="vm.costDistributions.length > 0"/>
+                                        <div class="row" ng-repeat="costDistribution in vm.costDistributions">
+                                            <div class="col-9">
+                                                <a href ng-click="vm.useCostDistribution(costDistribution)">{{costDistribution.name}}</a>
+                                            </div>
+                                            <div class="col-3 float-right">
+                                                <a href ng-click="vm.removeCostDistribution(costDistribution)"><span class="fas fa-trash"></span></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </span>
+                                            </div>
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr class="datatable__has-click-event" ng-repeat="costDistributionItem in vm.costDistributionItems" ng-if="vm.isReadOnlyMode() && vm.invoice.sumOfInvoice != undefined">
+                                        <td>
+                                            <div>
+                                                {{costDistributionItem.payerDTO.displayName}}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {{costDistributionItem.moneyValue | number}} €
+                                        </td>
+                                        <td>
+
+                                        </td>
+                                    </tr>
+                                    <tr class="datatable__has-click-event" ng-repeat="costDistributionItemTmp in vm.costDistributionItems" ng-if="!vm.isReadOnlyMode() && vm.invoice.sumOfInvoice != undefined"
+                                        ng-click="vm.updateCostDistributionItemDirectiveExec(costDistributionItemTmp.costDistributionItemId)" ng-disabled="vm.isReadOnlyMode()">
+                                        <td ng-click="vm.showDialog(costDistributionItemTmp.costDistributionItemId)">
+                                            <div>
+                                                {{costDistributionItemTmp.payerDTO.displayName}}
+                                            </div>
+                                        </td>
+                                        <td ng-click="vm.showDialog(costDistributionItemTmp.costDistributionItemId)">
+                                            {{costDistributionItemTmp.moneyValue | number}} €
+                                        </td>
+                                        <td class="text-right invoice-edit__cost-dist-table-paid-column">
+                                            <div class="d-inline" ng-if="vm.showCostPaymentPersonHasPaidButton(costDistributionItemTmp) && !vm.isReadOnlyMode()">
+                                                <a href class="p-1" ng-click="vm.setCostPaidStatus(costDistributionItemTmp)"><i class="fa fa-tachometer"></i><span class="invoice-edit__payment-button-paid p-1" ng-if="costDistributionItemTmp.costPaid && costDistributionItemTmp.costPaid > 0">BEZAHLT ({{costDistributionItemTmp.costPaid | number}} €)</span><span class="invoice-edit__payment-button-not-paid p-1" ng-if="!costDistributionItemTmp.costPaid || costDistributionItemTmp.costPaid === 0">UNBEZAHLT</span></a>
+                                            </div>
+                                            <span ng-if="!vm.isReadOnlyMode()">
+                                                <a href class="details-view__menu-item" ng-click="vm.removeCostDistributionItemFromList(costDistributionItemTmp)"><i class="fa fa-times-circle"></i></a>
+                                            </span>
+                                            <span ng-if="!vm.isReadOnlyMode() && vm.hasInvoiceImageValue && vm.hasScanRight">
+                                                <a class="details-view__menu-item" href ng-click="vm.selectArticleCostDistributionItem(costDistributionItemTmp)"><i class="fa fa-calculator"></i></a>
+                                            </span>
+                                        </td>
+                                    </tr>
+
+                                    </tbody>
+                                </table>
+
+                                <div id="articlesModalDialogCostDistributionItem" class="modal fade" role="dialog">
+                                    <div class="modal-dialog modal-xl">
+                                        <div ng-if="vm.showArticlesDialogForCostDistributionItem">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h4 class="modal-title">Positionen per Klick auswählen</h4>
+                                                    <button type="button" class="close" ng-click="vm.hideSelectArticleCostDistributionItemDialog()">&times;</button>
+                                                </div>
+                                                <div class="modal-body" >
+                                                    <div>
+                                                        <ms-articles-select ms-callback="vm.callbackForArticlesSelectCostDistributionItem"
+                                                                            ms-article-dialog-data="vm.selectedArticleCostDistributionItemData">
+                                                        </ms-articles-select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="datatable__has-click-event" ng-repeat="costDistributionItem in vm.costDistributionItems">
+                                    <ms-costdistributioncalculate ms-cost-distribution-item="costDistributionItem"
+                                                                  ms-cost-distribution-items="vm.costDistributionItems"
+                                                                  ms-sum-cost="vm.invoice.sumOfInvoice"
+                                                                  ms-update-method="vm.updateCostDistributionItemDirective[costDistributionItem.costDistributionItemId]"
+                                                                  ms-dialog-id="vm.getDialogIdWithoutHash(costDistributionItem.costDistributionItemId)">
+                                    </ms-costdistributioncalculate>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </form>
+            </div>
+            <div ng-class="vm.hasInvoiceImageValue || vm.imagePreview ? 'd-none d-xl-block col-xl-4' : 'd-none'">
+                <img id="imageTarget"  ng-src="{{vm.getInvoiceImageUrl()}}" class="img-fluid" ng-if="vm.hasInvoiceImageValue"/>
+                <img id="imageTargetPreview"  ng-src="{{vm.imagePreview}}" class="img-fluid" ng-if="vm.imagePreview"/>
+            </div>
+        </div>
+    </div>
+
+    <div ng-class="vm.hasInvoiceImageValue || vm.imagePreview ? 'col-12 d-xl-none mb-3' : 'd-none mb-3'">
+        <div>
+            <img data-toggle="modal" data-target="#imageModalZoom" ng-src="{{vm.getInvoiceImageUrl()}}" class="img-fluid" ng-if="vm.hasInvoiceImageValue"/>
+            <img id="imageTargetPreviewBottom"  ng-src="{{vm.imagePreview}}" class="img-fluid" ng-if="vm.imagePreview"/>
+        </div>
+    </div>
+
+    <div class="row" ng-if="vm.isStandingOrder == undefined || vm.isStandingOrder == false" >
+        <div class="col-12">
+            <div ng-if="vm.invoice.invoiceWorkflowMode === 'CREATED_USER_CHECK_MODE'" class="mt-2">
+                <span class="btn btn-primary float-right" ng-click="vm.setCorrectionStatus('READY')">
+                    Alles korrekt
+                    <div ng-class="vm.isNullOrUndefined(vm.correctionStatus) ? 'd-none' : 'fa fa-check'"></div>
+                </span>
+            </div>
+            <div ng-if="vm.invoice.invoiceWorkflowMode === 'EXTERNAL_USER_CHECK_MODE'" class="mt-2">
+                <!--<a href class="btn btn-warning float-right">Fehler melden</a>-->
+                <!--&nbsp;-->
+                <span class="btn btn-primary float-right" ng-click="vm.setCorrectionStatus('READY')">
+                    Alles korrekt
+                    <div ng-class="vm.isNullOrUndefined(vm.correctionStatus) ? 'd-none' : 'fa fa-check'"></div>
+                </span>
+                <span class="btn btn-warning float-right mr-2 mt-1" data-toggle="modal" data-target="#sendErrorMessageDialog">
+                    Fehler melden
+                    <div ng-class="vm.isNullOrUndefined(vm.correctionStatus) ? 'd-none' : 'fa fa-check'"></div>
+                </span>
+            </div>
+            <div ng-if="vm.invoice.invoiceWorkflowMode === 'EXTERNAL_USER_READY_MODE'">
+                <span class="btn btn-warning float-right mr-2" data-toggle="modal" data-target="#sendErrorMessageDialog">
+                    Fehler melden
+                    <div ng-class="vm.isNullOrUndefined(vm.correctionStatus) ? 'd-none' : 'fa fa-check'"></div>
+                </span>
+            </div>
+            <div id="sendErrorMessageDialog" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Fehler melden</h4>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div>Bitte beschreibe möglichst detailliert den Fehler in der Rechnung:</div>
+                            <textarea rows="2" maxlength="2000" class="form-control w-100" ng-model="vm.mistakeMessage"/>
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <button type="button" class="btn btn-primary w-100" data-dismiss="modal" ng-click="vm.sendMistakeMessage()" ng-disabled="!(vm.mistakeMessage.length > 0)">Senden</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="imageModalZoom" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" data-dismiss="modal">
+                <div class="modal-body">
+                    <img ng-src="{{vm.getInvoiceImageUrl()}}" class="img-fluid"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

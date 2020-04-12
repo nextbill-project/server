@@ -1,0 +1,175 @@
+<!--
+  ~ NextBill server application
+  ~
+  ~ @author Michael Roedel
+  ~ Copyright (c) 2020 Michael Roedel
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<main class="content">
+    <header>
+        <div class="row">
+            <div class="col-7">
+                <h2 class="header__title">
+                    <a role="button" ui-sref="budgets.list"><i class="fa fa-arrow-circle-left"></i></a>
+                    Budget-Details
+                </h2>
+                <h5><a href ng-click="vm.submitForm()">Speichern und zurück</a></h5>
+            </div>
+
+            <div class="col-5 text-right" ng-if="!vm.isReadOnlyMode() && !vm.createMode">
+                <a href class="details-view__menu-item details-view__menu-item__font-size" context-menu="vm.deleteConfirmationMenu" context-menu-on="click"><i class="far fa-trash-alt"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <div>
+        <div>
+            <form name="budgetForm" ng-submit="budgetForm.$valid && vm.submitForm()">
+                <div class="row">
+                    <div class="col-6">
+                        <h5>Name</h5>
+                    </div>
+                    <div class="col-6">
+                        <input type="text" class="form-control w-100" ng-model="vm.budget.name" ng-disabled="vm.isReadOnlyMode()"/>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <h5>Zeitraum</h5>
+                    </div>
+                    <div class="col-6">
+                        <select name="budgetRepeatSelect" class="form-control w-100" ng-model="vm.budget.budgetRepetitionType" ng-disabled="vm.isReadOnlyMode()">
+                            <option ng-repeat="budgetRepetitionType in vm.budgetRepetionTypeEnums"
+                                    value="{{budgetRepetitionType.name}}">
+                                {{budgetRepetitionType.displayName}}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <h5>Budget</h5>
+                    </div>
+                    <div class="col-6">
+                        <input type="number" class="form-control w-100" onclick="this.select();" ng-model="vm.budget.sum" step="0.01" ng-disabled="vm.isReadOnlyMode()"/>
+                    </div>
+                </div>
+                <hr/>
+                <div class="row">
+                    <div class="col-6">
+                        <h5>Sonderfall</h5>
+                    </div>
+                    <div class="col-6">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" ng-model="vm.budget.specialType" ng-disabled="vm.isReadOnlyMode()"> Aktiv
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <h5>Bemerkung</h5>
+                    </div>
+                    <div class="col-6">
+                        <input type="text" class="form-control" ng-model="vm.budget.remarks" ng-disabled="vm.isReadOnlyMode()">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <h5>Zahlungsart</h5>
+                    </div>
+                    <div class="col-6">
+                        <select name="repeatSelect" class="form-control w-100" ng-model="vm.budget.paymentTypeEnum" ng-disabled="vm.isReadOnlyMode()">
+                            <option value="">Bitte wählen</option>
+                            <option ng-repeat="paymentTypeEnum in vm.paymentTypeEnums"
+                                    value="{{paymentTypeEnum.name}}">
+                                {{paymentTypeEnum.displayName}}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <hr/>
+                <div class="row mb-2">
+                    <div class="col-4">
+                        <h5>Kostenträger</h5>
+                    </div>
+                    <div class="col-8">
+                        <div class="table-responsive budget-edit__table">
+                            <table class="table table-hover">
+                                <tbody>
+                                    <tr class="datatable__has-click-event" ng-repeat="payerDTO in vm.budget.payerDTOS" ng-disabled="vm.isReadOnlyMode()">
+                                        <td>
+                                            <div>
+                                                {{payerDTO.displayName}}
+                                            </div>
+                                        </td>
+                                        <td class="budget-edit__remove-column text-right">
+                                            <i class="fa fa-times-circle" ng-click="vm.removePersonFromList(payerDTO)"></i>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <span data-toggle="modal" data-target="#personadd"
+                              class="context float-right btn btn-outline-secondary btn-sm btn-round budget-edit__add-button" title="Kostenträger hinzufügen"
+                              ng-click="vm.showPersonAddDialog = true" ><i class="fas fa-user-plus"></i>
+                        </span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <h5>Kategorien</h5>
+                    </div>
+                    <div class="col-8">
+                        <div class="table-responsive budget-edit__table">
+                            <table class="table table-hover">
+                                <tbody>
+                                <tr class="datatable__has-click-event" ng-repeat="invoiceCategoryDTO in vm.budget.invoiceCategoryDTOS" ng-disabled="vm.isReadOnlyMode()">
+                                    <td>
+                                        <div>
+                                            {{invoiceCategoryDTO.invoiceCategoryName}}
+                                        </div>
+                                    </td>
+                                    <td class="text-right budget-edit__remove-column">
+                                        <i class="fa fa-times-circle" ng-click="vm.removeCategoryFromList(invoiceCategoryDTO)"></i>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <span data-toggle="modal" data-target="#addCategory"
+                              class="context float-right btn btn-outline-secondary btn-sm btn-round budget-edit__add-button" title="Kategorie hinzufügen"
+                              ng-click="vm.showCategoryAddDialog = true" ><i class="fa fa-tag"></i><i class="fa fa-plus"></i>
+                        </span>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <ms-paymentperson-select ms-callback-payment-person="vm.addPersonToList"
+                             ms-dialog-id="'personadd'" ms-hide-selection-button="true"
+                             ms-hidden-sel-button-activator="vm.showPersonAddDialog"
+                             disabled="vm.isReadOnlyMode()">
+    </ms-paymentperson-select>
+
+    <ms-invoicecategorie-select ms-return-invoice-category="vm.addCategoryToList"
+                                ms-dialog-id="'addCategory'" ms-hide-selection-button="true"
+                                ms-hidden-sel-button-activator="vm.showCategoryAddDialog"
+                                disabled="vm.isReadOnlyMode()">
+    </ms-invoicecategorie-select>
+</main>

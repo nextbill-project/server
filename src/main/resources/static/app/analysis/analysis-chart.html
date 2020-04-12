@@ -1,0 +1,171 @@
+<!--
+  ~ NextBill server application
+  ~
+  ~ @author Michael Roedel
+  ~ Copyright (c) 2020 Michael Roedel
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div class="content">
+    <header>
+        <h2 classs="header__title">
+            <i class="fas fa-fw fa-chart-line"></i>
+            Auswertung
+        </h2>
+    </header>
+    <div>
+        <div class="row">
+            <div class="d-xl-none col-12 mb-3">
+                <button type="button" class="btn btn-outline-secondary w-100" data-toggle="collapse"  data-target="#searchConfigurationPart">Suchfilter</button>
+                <div id="searchConfigurationPart" class="collapse">
+                    <ms-search-configuration ms-start-search="vm.startSearch">
+                    </ms-search-configuration>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <main class="col-12 col-xl-9">
+                <section>
+                    <div class="d-none d-xl-block mb-3">
+                        <div class="row">
+                            <div class="col-3">
+                                <div class="analysis-view__key-indicator__bg-color w-100 p-2 rounded">
+                                    <b>Durchschnittl. Einnahmen</b><br/>
+                                    {{vm.statisticData('MONTH_AVERAGE_INCOME') | number}} EUR
+                                </div>
+                            </div>
+                            <div class="col-4 col-offset-1">
+                                <div class="analysis-view__key-indicator__bg-color w-100 p-2 rounded">
+                                    <b>Rest am Monatsende</b><br/>
+                                    {{vm.statisticData('CALCULATED_PROFIT_FOR_MONTH') | number}} EUR
+                                </div>
+                            </div>
+                            <div class="col-3 col-offset-1">
+                                <div class="analysis-view__key-indicator__bg-color w-100 p-2 rounded">
+                                    <b>Durchschnittl. Ausgaben</b><br/>
+                                    {{vm.statisticData('MONTH_AVERAGE_EXPENSE') | number}} EUR
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-xl-none mb-3">
+                        <div class="row mb-3 mx-0">
+                            <div class="col-8 analysis-view__key-indicator__bg-color w-100 py-3 pr-0 rounded-left">
+                                <b>Durchschnittl. Einnahmen</b>
+                            </div>
+                            <div class="col-4 analysis-view__key-value-indicator__bg-color w-100 py-3 pl-3 rounded-right">
+                                {{vm.statisticData('MONTH_AVERAGE_INCOME') | number}} EUR
+                            </div>
+                        </div>
+                        <div class="row mb-3 mx-0">
+                            <div class="col-8 pr-0 analysis-view__key-indicator__bg-color w-100 py-3 rounded-left" >
+                                <b>Rest bis Monatsende</b>
+                            </div>
+                            <div class="col-4 analysis-view__key-value-indicator__bg-color w-100 py-3 pl-3 rounded-right">
+                                    {{vm.statisticData('CALCULATED_PROFIT_FOR_MONTH') | number}} EUR
+                            </div>
+                        </div>
+                        <div class="row mx-0">
+                            <div class="col-8 pr-0 analysis-view__key-indicator__bg-color w-100 py-3 rounded-left">
+                                <b>Durchschnittl. Ausgaben</b>
+                            </div>
+                            <div class="col-4 analysis-view__key-value-indicator__bg-color w-100 py-3 pl-3 rounded-right">
+                                {{vm.statisticData('MONTH_AVERAGE_EXPENSE') | number}} EUR
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-12 d-inline">
+                            <span ng-repeat="diagramOption in vm.diagramOptions" ng-class="diagramOption.isActive ? 'btn btn-warning' : 'btn btn-info'" ng-click="vm.setChartType(diagramOption)">{{diagramOption.name}}</span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-12 d-inline">
+                            <span ng-repeat="diagramViewOption in vm.diagramViewOptions" ng-class="diagramViewOption.isActive ? 'btn btn-warning' : 'btn btn-primary'" ng-click="vm.setChartViewType(diagramViewOption)">{{diagramViewOption.name}}</span>
+                        </div>
+                    </div>
+
+                    <div class="mx-auto mt-5" ng-if="vm.chartServiceLoading()">
+                        <div class="loader loader__small"></div>
+                    </div>
+
+                    <div class="mt-3" ng-if="!vm.chartServiceLoading()">
+                        <div class="row d-xl-none">
+                            <div class="col-12">
+                                <div class="search-component search-component__month__bg-color">
+                                    <h5>Monatsauswahl</h5>
+                                    <div class="row mb-3 justify-content-center">
+                                        <div class="col-8 text-center">
+                                            <select name="repeatSelectMonth" class="form-control w-100" ng-change="vm.transferSelectionToSearch()" ng-model="vm.selectedMonth">
+                                                <option value="">
+                                                    Keine Auswahl
+                                                </option>
+                                                <option ng-repeat="monthRange in vm.monthRanges"
+                                                        value="{{monthRange.monthNumber}}">
+                                                    {{monthRange.monthName}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4" ng-if="!vm.chartServiceLoading()">
+                        <div class="col-12">
+                            <canvas ng-if="vm.diagramViewType.code === 'PIE'" id="doughnut" class="chart chart-doughnut analysis-view__chart__size"
+                                    chart-data="vm.chartData" chart-labels="vm.labels" chart-options="vm.pieChartOptions">
+                            </canvas>
+                            <canvas ng-if="vm.diagramViewType.code === 'BAR'" id="line" class="chart chart-line analysis-view__chart__size" chart-data="vm.chartData"
+                                    chart-labels="vm.labels" chart-options="vm.barChartOptions">
+                            </canvas>
+                        </div>
+                    </div>
+                </section>
+            </main>
+            <aside class="d-none d-xl-block col-xl-3">
+                <div class="row" >
+                    <div class="col-12">
+                        <div class="search-component search-component__month__bg-color">
+                            <h5>Monatsauswahl</h5>
+                            <div class="row justify-content-center mb-3">
+                                <div class="col-10 text-center">
+                                    <select name="repeatSelectMonth" class="form-control w-100" ng-change="vm.transferSelectionToSearch()" ng-model="vm.selectedMonth" ng-disabled="vm.chartServiceLoading()">
+                                        <option value="">
+                                            Keine Auswahl
+                                        </option>
+                                        <option ng-repeat="monthRange in vm.monthRanges"
+                                                value="{{monthRange.monthNumber}}">
+                                            {{monthRange.monthName}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <ms-search-configuration ms-start-search="vm.startSearch">
+                        </ms-search-configuration>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+</div>

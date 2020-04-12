@@ -1,0 +1,115 @@
+<!--
+  ~ NextBill server application
+  ~
+  ~ @author Michael Roedel
+  ~ Copyright (c) 2020 Michael Roedel
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div class="content">
+    <header>
+        <h2 class="header__title">
+            <i class="fas fa-fw fa-file-upload"></i>
+            Analyse von Dateien
+        </h2>
+    </header>
+    <div  nv-file-over="" nv-file-drop="" uploader="vm.uploader">
+        <div>
+            <div class="mb-5">
+                <h4>Bitte Dateien hochladen</h4>
+
+                <div ng-show="vm.uploader.isHTML5">
+                    <div class="file-drop-zone" nv-file-drop="" nv-file-over="" uploader="vm.uploader">
+                        Dateien können hier einfach abgelegt werden. <br/>Sie werden automatisch der Warteschlange hinzugefügt.
+                    </div>
+                </div>
+                <br/>
+                <p><b>oder</b></p>
+                Dateiauswahl:
+                <input type="file" nv-file-select="" uploader="vm.uploader" multiple  /><br/>
+            </div>
+
+            <div>
+
+                <h4>Warteschlange</h4>
+                <p>Anzahl: {{ vm.uploader.queue.length }}</p>
+
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th width="50%">Name</th>
+                        <th ng-show="vm.uploader.isHTML5" class="d-none d-sm-block d-none d-md-block">Größe</th>
+                        <th ng-show="vm.uploader.isHTML5">Progress</th>
+                        <th class="d-none d-sm-block d-none d-md-block">Status</th>
+                        <th>Aktionen</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="item in vm.uploader.queue">
+                        <td><strong>{{ item.file.name }}</strong></td>
+                        <td ng-show="vm.uploader.isHTML5" nowrap  class="d-none d-sm-block d-none d-md-block">{{ item.file.size/1024/1024|number:2 }} MB</td>
+                        <td ng-show="vm.uploader.isHTML5">
+                            <div class="progress mb-0">
+                                <div class="progress-bar" role="progressbar" ng-style="{ 'width': item.progress + '%' }"></div>
+                            </div>
+                        </td>
+                        <td class="text-center d-none d-sm-block d-none d-md-block">
+                            <span ng-show="item.isSuccess"><i class="fa fa-check"></i></span>
+                            <span ng-show="item.isError"><i class="fa fa-times-circle"></i></span>
+                        </td>
+                        <td nowrap>
+
+                            <button type="button" class="btn btn-success btn-xs" ng-click="item.upload()" ng-disabled="item.isReady || item.isUploading || item.isSuccess">
+                                <span class="fa fa-cloud-upload"></span> Hochladen
+                            </button>
+                            <br  class="d-md-none"/>
+                            <button type="button" class="btn btn-warning btn-xs d-none d-sm-inline d-none d-md-inline" ng-click="item.cancel()" ng-disabled="!item.isUploading">
+                                <span class="fa fa-ban"></span> Abbrechen
+                            </button>
+                            <button type="button" class="btn btn-danger btn-xs" ng-click="item.remove()">
+                                <span class="fas fa-trash"></span> Entfernen
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <div>
+                    <div>
+                        Fortschritt:
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" ng-style="{ 'width': vm.uploader.progress + '%' }"></div>
+                        </div>
+                    </div>
+                    <div class="mt-3 d-inline">
+                        <button type="button" class="btn btn-success btn-s" ng-click="vm.uploader.uploadAll()" ng-disabled="!vm.uploader.getNotUploadedItems().length">
+                            <span class="fa fa-cloud-upload"></span> Alle hochladen
+                        </button>
+                        <button type="button" class="btn btn-warning btn-s d-none d-sm-inline d-none d-md-inline" ng-click="vm.uploader.cancelAll()" ng-disabled="!vm.uploader.isUploading">
+                            <span class="fa fa-ban"></span> Alle abbrechen
+                        </button>
+                        <button type="button" class="btn btn-danger btn-s" ng-click="vm.uploader.clearQueue()" ng-disabled="!vm.uploader.queue.length">
+                            <span class="fas fa-trash"></span> Alle entfernen
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    </div>
+</div>

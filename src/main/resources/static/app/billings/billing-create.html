@@ -1,0 +1,106 @@
+<!--
+  ~ NextBill server application
+  ~
+  ~ @author Michael Roedel
+  ~ Copyright (c) 2020 Michael Roedel
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<div class="content">
+    <header>
+        <h2 class="header__title">
+            <a role="button" ui-sref="billings.processList"><i class="fa fa-arrow-circle-left"></i></a>
+            Abrechnung erstellen
+        </h2>
+    </header>
+    <main>
+        <div class="row">
+            <div class="col-xl-4 col-12">
+                <div class="row mb-3"  ng-if="vm.billingListItem">
+                    <div class="col-12">
+                        <div class="row justify-content-center">
+                            <div class="col-12 text-center d-inline">
+                                <h3 class="d-inline-block">{{vm.billingListItem.invoicePayer.paymentPersonName}}</h3>
+                                <i class="fa fa-arrow-right mx-3"></i>
+                                <h3 class="d-inline-block">{{vm.billingListItem.costPayer.paymentPersonName}}</h3>
+                            </div>
+                        </div>
+                        <div class="row justify-content-center">
+                            <div class="col-12">
+                                <h3 class="text-center w-100">{{vm.billingListItem.sumToBePaid | number}} €</h3>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6"><b>Summe:</b>&nbsp;{{vm.billingListItem.costsFromInvoicePayer | number}}</div>
+                            <div class="col-6"><b>Summe:</b>&nbsp;{{vm.billingListItem.costsFromCostPayer | number}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6"><p><b>Kategorien:</b></p>
+                                <div ng-if="vm.billingListItem.invoiceCategoriesOfInvoicePayer.length">{{vm.getCategoriesForInvoicePayer(vm.billingListItem)}}</div>
+                                <div ng-if="!vm.billingListItem.invoiceCategoriesOfInvoicePayer.length">Keine Kategorien gefunden!</div>
+                            </div>
+                            <div class="col-6"><p><b>Kategorien:</b></p>
+                                <div ng-if="vm.billingListItem.invoiceCategoriesOfCostPayer.length">{{vm.getCategoriesForCostPayer(vm.billingListItem)}}</div>
+                                <div ng-if="!vm.billingListItem.invoiceCategoriesOfCostPayer.length">Keine Kategorien gefunden!</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="row mt-3" ng-if="vm.smtpMailServiceEnabled">
+                            <div class="col-12">
+                                <h3>E-Mail-Versand</h3>
+                                <div><input type="checkbox" ng-model="vm.billingConfig.sendMailInvoicePayer">&nbsp;E-Mail an mich</input></div>
+                                <div><input type="checkbox" ng-model="vm.billingConfig.sendMailCostPayer">&nbsp;E-Mail an Kostenträger</input></div>
+                                <div ng-if="vm.billingConfig.sendMailCostPayer"><b>E-Mail-Adresse:</b><input type="email" class="form-control" ng-model="vm.billingConfig.costPayerMail" /></div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <span ng-click="vm.createBilling()" class="btn btn-primary w-100 billing-create__pay-button" ng-disabled="vm.lockBillingButton">Abrechnen</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-8 col-12">
+                <div class="billing_create">
+                    <div class="row my-3">
+                        <div class="col-12 justify-content-center text-center">
+                            <h3>
+                                <span>{{vm.billingListItem.invoicePayer.paymentPersonName}}</span>
+                                <i class="fa fa-arrow-right mx-3" ng-if="!vm.switched" ng-click="vm.toggleSwitch()"></i>
+                                <i class="fa fa-arrow-left mx-3" ng-if="vm.switched" ng-click="vm.toggleSwitch()"></i>
+                                <span>{{vm.billingListItem.costPayer.paymentPersonName}}</span>
+                            </h3>
+                            <h8>
+                                (Bitte auf den Pfeil klicken, um Perspektive zu wechseln!)
+                            </h8>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12" ng-if="vm.switched">
+                            <ms-invoice-table ms-invoices="vm.billingListItem.invoicesForInvoicePayer" ms-selected="vm.selected" ms-use-selection="false" ms-read-only="true" ms-use-debt="true" ms-return-view="vm.returnViewObject"></ms-invoice-table>
+                        </div>
+                        <div class="col-12" ng-if="!vm.switched">
+                            <ms-invoice-table ms-invoices="vm.billingListItem.invoicesForCostPayer" ms-selected="vm.selected" ms-use-selection="false" ms-read-only="true" ms-use-debt="true" ms-return-view="vm.returnViewObject"></ms-invoice-table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
