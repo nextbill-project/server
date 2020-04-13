@@ -32,6 +32,7 @@ public class SettingsDTO {
     private Boolean isCustomized;
 
     private String filesPath;
+    private boolean filesPathEditable;
 
     private String salt;
     private String clientSecret;

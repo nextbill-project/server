@@ -25,6 +25,7 @@ import de.nextbill.domain.dtos.SettingsDTO;
 import de.nextbill.domain.model.Settings;
 import de.nextbill.domain.repositories.SettingsRepository;
 import de.nextbill.domain.utils.BeanMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -64,12 +65,24 @@ public class SettingsService {
 
     public SettingsDTO mapToDTO(Settings settings){
         BeanMapper beanMapper = new BeanMapper();
-        return beanMapper.map(settings, SettingsDTO.class);
+        SettingsDTO settingsDTO = beanMapper.map(settings, SettingsDTO.class);
+
+        String profiles = StringUtils.join(this.environment.getActiveProfiles(), " ");
+        settingsDTO.setFilesPathEditable(!profiles.contains("docker"));
+
+        return settingsDTO;
     }
 
     public Settings mapToEntity(SettingsDTO settingsDTO){
         BeanMapper beanMapper = new BeanMapper();
-        return beanMapper.map(settingsDTO, Settings.class);
+        Settings settings = beanMapper.map(settingsDTO, Settings.class);
+
+        String profiles = StringUtils.join(this.environment.getActiveProfiles(), " ");
+        if(profiles.contains("docker")) {
+            settings.setFilesPath(Paths.get("/").resolve(filesPath).toAbsolutePath().toString());
+        }
+
+        return settings;
     }
 
     public boolean areSettingsInitialized() {
@@ -105,18 +118,22 @@ public class SettingsService {
         settings.setSettingsId(UUID.randomUUID());
         settings.setIsCustomized(false);
 
-        File file = new File(System.getProperty("user.home"));
-        if (file.exists()){
-            settings.setFilesPath(file.toPath().resolve("nextbill").toAbsolutePath().toString());
+        String profiles = StringUtils.join(this.environment.getActiveProfiles(), " ");
+        if(profiles.contains("docker")) {
+            settings.setFilesPath(Paths.get("/").resolve(filesPath).toAbsolutePath().toString());
         }else{
-            File jarDir = null;
-            try {
-                jarDir = new File(Application.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-                settings.setFilesPath(Paths.get(jarDir.getAbsolutePath()).resolve(filesPath).toAbsolutePath().toString());
-            } catch (URISyntaxException e) {
-                settings.setFilesPath(Paths.get("/").resolve(filesPath).toAbsolutePath().toString());
+            File file = new File(System.getProperty("user.home"));
+            if (file.exists()){
+                settings.setFilesPath(file.toPath().resolve("nextbill").toAbsolutePath().toString());
+            }else{
+                File jarDir = null;
+                try {
+                    jarDir = new File(Application.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+                    settings.setFilesPath(Paths.get(jarDir.getAbsolutePath()).resolve(filesPath).toAbsolutePath().toString());
+                } catch (URISyntaxException e) {
+                    settings.setFilesPath(Paths.get("/").resolve(filesPath).toAbsolutePath().toString());
+                }
             }
-
         }
 
         settings.setImapMailServiceEnabled(false);
