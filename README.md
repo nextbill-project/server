@@ -2,7 +2,7 @@
 
 **The easy way to split and manage invoices**
 
-![](https://raw.githubusercontent.com/nextbill-project/server/master/webapp_screenshot.png)
+![](https://raw.githubusercontent.com/nextbill-project/nextbill-project.github.io/master/screenshots/webapp/details.png)
 
 ## NextBill is great for... ##
 
