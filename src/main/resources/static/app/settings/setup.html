@@ -62,7 +62,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="pathToFiles">Speicherort für Dateien</label>
-                                <input type="text" class="form-control" id="pathToFiles" placeholder="/nextbill" ng-model="vm.setupData.filesPath" required>
+                                <input type="text" class="form-control" id="pathToFiles" placeholder="/nextbill" ng-model="vm.setupData.filesPath" ng-disabled="!vm.setupData.filesPathEditable" ng-required="vm.setupData.filesPathEditable">
                             </div>
                             <div class="form-group">
                                 <label for="domainUrl">Domain URL</label>
