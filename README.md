@@ -2,7 +2,7 @@
 
 **The easy way to split and manage invoices**
 
-![](https://raw.githubusercontent.com/nextbill-project/server/master/webapp_screenshot.png)
+![](https://raw.githubusercontent.com/nextbill-project/nextbill-project.github.io/master/screenshots/webapp/details.png)
 
 ## NextBill is great for... ##
 
@@ -43,7 +43,7 @@ You want to contribute? That's great! Please use the following steps and your ch
 
 ### How to contribute
 
-1. Tell us your objective by writing or commenting an issue
+1. Tell us your objective by writing or commenting an issue or send an email to kontakt@nextbill.de
 2. Create a branch and implement the issue of your choice
 3. Commit with a meaningful message and the issue ID
 4. Create a pull request and wait for feedback
