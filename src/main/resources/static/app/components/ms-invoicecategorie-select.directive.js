@@ -111,7 +111,7 @@
 		};
 
 		vm.refreshInvoiceParents = function(){
-			vm.categorieParentsFiltered = _.filter(InvoicecategoriesService.getParentInvoiceCategories(), function(parentInvoiceCategory){
+			vm.categorieParentsFiltered = _.filter(InvoicecategoriesService.getParentInvoiceCategories(vm.expenseType), function(parentInvoiceCategory){
 				var hasChilds = false;
 
 				var childCategories = _.filter(InvoicecategoriesService.getInvoiceCategories(), function(invoiceCategory){ return (invoiceCategory.parentInvoiceCategoryDTO != null && parentInvoiceCategory.invoiceCategoryId === invoiceCategory.parentInvoiceCategoryDTO.invoiceCategoryId);});

@@ -35,14 +35,14 @@
             </div>
 
             <div class="col-5 text-right" ng-if="!vm.isReadOnlyMode()">
+                <a href class="details-view__menu-item details-view__menu-item__font-size mr-1" ng-click="vm.resetInvoice()" ng-if="vm.areChanges()">
+                    <i class="fa fa-undo"></i>
+                </a>
                 <a href class="details-view__menu-item details-view__menu-item__font-size mr-1" ng-if="vm.invoice.invoiceWorkflowMode === 'CREATED_USER_READY_MODE' || vm.invoice.invoiceWorkflowMode === 'EXTERNAL_USER_READY_MODE'" ng-click="vm.setCorrectionStatus('CHECK')">
                     <i class="fa fa-unlock"></i>
                 </a>
                 <a href class="details-view__menu-item details-view__menu-item__font-size mr-1" ng-click="vm.repeatAnalysis()" ng-if="vm.hasInvoiceImageValue && vm.hasScanRight">
                     <i class="fas fa-magic"></i>
-                </a>
-                <a href class="details-view__menu-item details-view__menu-item__font-size mr-1" ng-click="vm.resetInvoice()" ng-if="vm.areChanges()">
-                    <i class="fa fa-undo"></i>
                 </a>
                 <a href class="details-view__menu-item details-view__menu-item__font-size mr-1" ng-if="!vm.isStandingOrder && !vm.invoice.standingOrderInvoiceTemplateId" data-toggle="modal" data-target="#standingOrderModalDialog">
                     <i class="fas fa-sync"></i>

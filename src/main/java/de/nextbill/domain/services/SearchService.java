@@ -433,14 +433,11 @@ public class SearchService {
                 List<InvoiceCostDistributionItem> invoiceCostDistributionItems = search(true, searchDTO, allCheckListInvoiceIds);
                 invoices.addAll(invoicesInInvoiceCostDistributionItems(invoiceCostDistributionItems).stream().filter(t -> allCheckListInvoiceIds.contains(t.getInvoiceId())).collect(Collectors.toList()));
             }else{
-                Date startDateOfBean = searchDTO.getStartDate();
 
-                Date newestDate = null;
-                if (startDateOfBean != null) {
-                    newestDate = invoiceRepository.findNewestDateForReadyList(currentUser.getAppUserId().toString(), userContactIds,startDateOfBean);
-                }else{
-                    newestDate = (Date) invoiceRepository.findNewestDateForReadyList(currentUser.getAppUserId().toString(), userContactIds);
-                }
+                List<UUID> allReadyListInvoiceIds = invoiceRepository.findAllIdsForReadyList(currentUser.getAppUserId().toString(), userContactIds);
+                List<UUID> allFoundInvoices = invoicesInInvoiceCostDistributionItems(search(true, searchDTO, allReadyListInvoiceIds)).stream().map(Invoice::getInvoiceId).collect(Collectors.toList());
+
+                Date newestDate = (Date) invoiceRepository.findNewestDateForReadyList(currentUser.getAppUserId().toString(), userContactIds, allFoundInvoices);
 
                 Integer currentAmountMonths = pageNumber.orElse(0);
                 Integer amountMonth = pageNumber.orElse(0);
@@ -449,7 +446,7 @@ public class SearchService {
 
                     if (newestDate != null) {
                         Date endOfMonthOfNewestDate = firstDayOfMonth(newestDate);
-                        newestDate = invoiceRepository.findNewestDateForReadyList(currentUser.getAppUserId().toString(), userContactIds, endOfMonthOfNewestDate);
+                        newestDate = invoiceRepository.findNewestDateForReadyList(currentUser.getAppUserId().toString(), userContactIds, endOfMonthOfNewestDate, allFoundInvoices);
                     }
                 }
 
@@ -457,7 +454,6 @@ public class SearchService {
                     searchDTO.setStartDate( firstDayOfMonth(newestDate) );
                     searchDTO.setEndDate( lastDayOfMonth(newestDate) );
 
-                    List<UUID> allReadyListInvoiceIds = invoiceRepository.findAllIdsForReadyList(currentUser.getAppUserId().toString(), userContactIds);
                     invoices.addAll(invoicesInInvoiceCostDistributionItems(search(true, searchDTO, allReadyListInvoiceIds)));
                 }
 

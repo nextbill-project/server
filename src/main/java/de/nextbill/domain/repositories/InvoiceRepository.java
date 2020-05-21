@@ -82,22 +82,22 @@ public interface InvoiceRepository extends PagingAndSortingRepository<Invoice, U
     List<UUID> findAllIdsForReadyList(@Param("appUser") String appUser, @Param("userContactIds") List<UUID> userContactIds);
 
     @Query("SELECT MAX(j.dateOfInvoice) FROM Invoice j, CostDistributionItem c WHERE c.invoice = j " +
-            "AND j NOT IN (SELECT i FROM Invoice i, StandingOrder s JOIN s.invoiceTemplate si WHERE si = i) " +
+            "AND j NOT IN (SELECT i FROM Invoice i, StandingOrder s JOIN s.invoiceTemplate si WHERE si = i) AND j.invoiceId IN :invoiceIds " +
             " AND (" +
             "(j.createdBy = :appUser AND j.invoiceStatusEnum LIKE 'READY') OR " +
             "(j.invoiceStatusEnum LIKE 'READY' AND c.payerId IN :userContactIds AND (c.correctionStatus LIKE 'READY' OR c.correctionStatus LIKE 'IGNORE' )) OR " +
             "(j.invoiceStatusEnum LIKE 'READY' AND (j.payerId IN :userContactIds OR j.paymentRecipientId IN :userContactIds) AND (j.correctionStatus IS NULL OR j.correctionStatus LIKE 'READY' OR j.correctionStatus LIKE 'IGNORE') ) " +
             ")")
-    Object findNewestDateForReadyList(@Param("appUser") String appUser, @Param("userContactIds") List<UUID> userContactIds);
+    Object findNewestDateForReadyList(@Param("appUser") String appUser, @Param("userContactIds") List<UUID> userContactIds, @Param("invoiceIds") List<UUID> invoiceIds);
 
     @Query("SELECT MAX(j.dateOfInvoice) FROM Invoice j, CostDistributionItem c WHERE c.invoice = j AND j.dateOfInvoice < :startDate " +
-            "AND j NOT IN (SELECT i FROM Invoice i, StandingOrder s JOIN s.invoiceTemplate si WHERE si = i) " +
+            "AND j NOT IN (SELECT i FROM Invoice i, StandingOrder s JOIN s.invoiceTemplate si WHERE si = i) AND j.invoiceId IN :invoiceIds " +
             " AND (" +
             "(j.createdBy = :appUser AND j.invoiceStatusEnum LIKE 'READY') OR " +
             "(j.invoiceStatusEnum LIKE 'READY' AND c.payerId IN :userContactIds AND (c.correctionStatus LIKE 'READY' OR c.correctionStatus LIKE 'IGNORE' )) OR " +
             "(j.invoiceStatusEnum LIKE 'READY' AND (j.payerId IN :userContactIds OR j.paymentRecipientId IN :userContactIds) AND (j.correctionStatus IS NULL OR j.correctionStatus LIKE 'READY' OR j.correctionStatus LIKE 'IGNORE') ) " +
             ")")
-    Date findNewestDateForReadyList(@Param("appUser") String appUser, @Param("userContactIds") List<UUID> userContactIds, @Param("startDate") Date startDate);
+    Date findNewestDateForReadyList(@Param("appUser") String appUser, @Param("userContactIds") List<UUID> userContactIds, @Param("startDate") Date startDate, @Param("invoiceIds") List<UUID> invoiceIds);
 
     List<Invoice> findByPaymentRecipientIdAndPaymentRecipientTypeEnumAndInvoiceStatusEnumAndCreatedBy(UUID paymentRecipientId, PaymentPersonTypeEnum paymentRecipientTypeEnum, InvoiceStatusEnum invoiceStatusEnum, AppUser createdBy);
 
