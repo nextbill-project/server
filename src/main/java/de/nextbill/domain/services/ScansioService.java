@@ -182,7 +182,7 @@ public class ScansioService {
 
         RecognitionResponseV1 response = sendDataOrImageToScansioForCategory(invoice, externalScanConfiguration);
 
-        if (!response.getItemResults().isEmpty()){
+        if (response != null && !response.getItemResults().isEmpty()){
             RecognitionItemResponseV1 category = response.getItemResults().get(0);
             if (ItemWorkflowStatus.HIT_FOUND.equals(category.getItemWorkflowStatus()) && category.getResultValue() != null){
                 UUID categoryId = UUID.fromString((String) category.getResultValue());
