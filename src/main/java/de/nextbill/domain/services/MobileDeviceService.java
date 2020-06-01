@@ -155,6 +155,7 @@ public class MobileDeviceService {
         List<BasicData> basicDatas = basicDataRepository.findAllByAppUserAndBasicDataType(currentUser, BasicDataType.STATISTIC);
         basicDatas.addAll(basicDataRepository.findAllByAppUserAndBasicDataType(currentUser, BasicDataType.MISTAKE_MESSAGE));
         basicDatas.addAll(basicDataRepository.findAllByAppUserAndBasicDataType(currentUser, BasicDataType.CHANGED_MESSAGE));
+        basicDatas.addAll(basicDataRepository.findAllByAppUserAndBasicDataType(currentUser, BasicDataType.INTERNAL_DATA));
 
         List<BusinessPartner> businessPartners = businessPartnerRepository.findAllByLastModifiedAtAfter(mofifiedSinceDate);
         List<UUID> businessPartnerIds = businessPartners.stream().map(BusinessPartner::getBusinessPartnerId).collect(Collectors.toList());

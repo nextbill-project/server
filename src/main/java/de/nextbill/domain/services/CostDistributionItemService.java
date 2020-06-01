@@ -22,10 +22,9 @@ package de.nextbill.domain.services;
 
 import de.nextbill.domain.dtos.ArticleDTO;
 import de.nextbill.domain.dtos.CostDistributionItemDTO;
+import de.nextbill.domain.enums.PaymentPersonTypeEnum;
 import de.nextbill.domain.interfaces.PaymentPerson;
-import de.nextbill.domain.model.CostDistribution;
-import de.nextbill.domain.model.CostDistributionItem;
-import de.nextbill.domain.model.Invoice;
+import de.nextbill.domain.model.*;
 import de.nextbill.domain.repositories.CostDistributionItemRepository;
 import de.nextbill.domain.repositories.CostDistributionRepository;
 import de.nextbill.domain.repositories.InvoiceRepository;
@@ -62,6 +61,9 @@ public class CostDistributionItemService {
 
     @Autowired
     private BillingService billingService;
+
+    @Autowired
+    private MessagingService messagingService;
 
     public CostDistributionItemDTO mapToDTO(CostDistributionItem costDistributionItem){
         return mapToDTO(costDistributionItem, null);
@@ -163,6 +165,19 @@ public class CostDistributionItemService {
         costDistributionItemRepository.deleteAll(costDistributionItemsToDelete);
         invoice.setLastModifiedAt(new Date());
         invoiceRepository.save(invoice);
+
+        for (CostDistributionItem costDistributionItem : costDistributionItemsToDelete) {
+            PaymentPerson paymentPerson = paymentPersonService.findPaymentPerson(costDistributionItem.getCostPayerId(), costDistributionItem.getPaymentPersonTypeEnum());
+            AppUser appUser = null;
+            if (paymentPerson instanceof AppUser) {
+                appUser = (AppUser) paymentPerson;
+            }else if (paymentPerson instanceof UserContact) {
+                appUser = ((UserContact) paymentPerson).getAppUserContact();
+            }
+            if (appUser != null && !appUser.getAppUserId().toString().equals(invoice.getCreatedBy())) {
+                messagingService.createInternalDataInvoiceDeletedMessage(appUser, invoice);
+            }
+        }
 
         Integer counter = 0;
         for (CostDistributionItem costDistributionItem : costDistributionItemsAdded) {

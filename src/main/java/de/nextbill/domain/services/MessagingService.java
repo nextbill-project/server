@@ -489,4 +489,19 @@ public class MessagingService {
         }
     }
 
+    public BasicData createInternalDataInvoiceDeletedMessage(AppUser appUserTo, Invoice invoice){
+        BasicData basicData = new BasicData();
+        basicData.setBasicDataId(UUID.randomUUID());
+        basicData.setAppUser(appUserTo);
+        basicData.setBasicDataType(BasicDataType.INTERNAL_DATA);
+        basicData.setBasicDataSubType(BasicDataSubType.INVOICE_DELETED);
+        basicData.setObject1Class(Invoice.class.getSimpleName());
+        basicData.setObject1Id(invoice.getInvoiceId().toString());
+        basicData.setNumberValue(new BigDecimal((new Date()).getTime()));
+
+        basicDataRepository.save(basicData);
+
+        return basicData;
+    }
+
 }
