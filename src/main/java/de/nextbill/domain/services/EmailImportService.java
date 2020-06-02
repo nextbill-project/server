@@ -36,6 +36,7 @@ import de.nextbill.domain.repositories.InvoiceRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.mime.MediaType;
+import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -176,6 +177,10 @@ public class EmailImportService {
 						if (text != null){
 							invoice.setRemarks(text.trim());
 							invoice = invoiceRepository.save(invoice);
+						}else if (html != null) {
+							String textWithoutHtml = Jsoup.parse(html).text();
+							invoice.setRemarks(textWithoutHtml.trim());
+							invoice = invoiceRepository.save(invoice);
 						}
 
 						if (settings.getUseFirefoxForHtmlToImage()){
@@ -195,8 +200,10 @@ public class EmailImportService {
 								}else if (SioContentType.HTML.equals(sioContentType)){
 
 									RecognitionResponseV1 recognitionResponseV1 = null;
-									if (settings.getUseFirefoxForHtmlToImage() && imageConversionService.fileForOriginal(invoice) != null){
+									if (settings.getUseFirefoxForHtmlToImage() && imageConversionService.fileForOriginal(invoice) != null) {
 										recognitionResponseV1 = scansioService.sendImageForInvoiceToScansio(invoice, false);
+									}else if (html != null){
+											recognitionResponseV1 = scansioService.sendHtmlToScansioForInvoice(invoice, html);
 									}else{
 										if (text != null){
 											recognitionResponseV1 = scansioService.sendTextToScansio(invoice, text);
