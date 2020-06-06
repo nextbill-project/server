@@ -1,0 +1,6 @@
+logging:
+  level:
+    de.nextbill.domain.service: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: INFO

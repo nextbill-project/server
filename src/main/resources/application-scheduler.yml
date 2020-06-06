@@ -1,0 +1,5 @@
+jobs:
+  StandingOrderScheduler: 0 1/4 * ? * *
+  StatisticScheduler: 0 1/4 * ? * *
+  EMailImportScheduler: 0 1/4 * ? * *
+  BusinessPartnerPublicScheduler: 0 1/4 * ? * *
