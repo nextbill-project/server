@@ -404,6 +404,19 @@ public class InvoiceService {
     @Transactional
     public void deleteInvoice(Invoice invoice, boolean deleteCostDistributionItems, boolean deleteComplete){
 
+        for (CostDistributionItem costDistributionItem : invoice.getCostDistributionItems()) {
+            PaymentPerson paymentPerson = paymentPersonService.findPaymentPerson(costDistributionItem.getCostPayerId(), costDistributionItem.getPaymentPersonTypeEnum());
+            AppUser appUser = null;
+            if (paymentPerson instanceof AppUser) {
+                appUser = (AppUser) paymentPerson;
+            }else if (paymentPerson instanceof UserContact) {
+                appUser = ((UserContact) paymentPerson).getAppUserContact();
+            }
+            if (appUser != null) {
+                messagingService.createInternalDataInvoiceDeletedMessage(appUser, invoice);
+            }
+        }
+
         invoice.setInvoiceStatusEnum(InvoiceStatusEnum.DELETED);
         invoice.setStandingOrder(null);
         invoice = invoiceRepository.save(invoice);

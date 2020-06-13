@@ -40,6 +40,13 @@ public class CustomTokenEnhancer extends JwtAccessTokenConverter {
                                      OAuth2Authentication authentication) {
 
         Map<String, Object> info = new LinkedHashMap<String, Object>(accessToken.getAdditionalInformation());
+        if (authentication.getPrincipal() instanceof AuthUserDTO) {
+            AuthUserDTO principal = (AuthUserDTO) authentication.getPrincipal();
+            info.put("userId", principal.getAppUserId().toString());
+        }else {
+            String principal = (String) authentication.getPrincipal();
+            info.put("userId", principal);
+        }
 
         DefaultOAuth2AccessToken customAccessToken = new DefaultOAuth2AccessToken(accessToken);
         customAccessToken.setAdditionalInformation(info);

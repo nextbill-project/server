@@ -23,17 +23,13 @@ package de.nextbill.domain.controller;
 import de.nextbill.domain.dtos.CostDistributionItemDTO;
 import de.nextbill.domain.enums.BasicStatusEnum;
 import de.nextbill.domain.enums.InvoiceStatusEnum;
-import de.nextbill.domain.model.AppUser;
-import de.nextbill.domain.model.CostDistribution;
-import de.nextbill.domain.model.CostDistributionItem;
-import de.nextbill.domain.model.Invoice;
+import de.nextbill.domain.interfaces.PaymentPerson;
+import de.nextbill.domain.model.*;
 import de.nextbill.domain.repositories.AppUserRepository;
 import de.nextbill.domain.repositories.CostDistributionItemRepository;
 import de.nextbill.domain.repositories.CostDistributionRepository;
 import de.nextbill.domain.repositories.InvoiceRepository;
-import de.nextbill.domain.services.BillingService;
-import de.nextbill.domain.services.BudgetService;
-import de.nextbill.domain.services.CostDistributionItemService;
+import de.nextbill.domain.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -73,6 +69,12 @@ public class CostDistributionItemController {
 
 	@Autowired
 	private BudgetService budgetService;
+
+	@Autowired
+	private PaymentPersonService paymentPersonService;
+
+	@Autowired
+	private MessagingService messagingService;
 
 	@ResponseBody
 	@RequestMapping(value = "/costdistributionitems", method = RequestMethod.GET)
@@ -187,11 +189,24 @@ public class CostDistributionItemController {
 			return new ResponseEntity<>(HttpStatus.OK);
 		}
 
+		Invoice invoice = costDistributionItem.getInvoice();
+		if (invoice != null) {
+			PaymentPerson paymentPerson = paymentPersonService.findPaymentPerson(costDistributionItem.getCostPayerId(), costDistributionItem.getPaymentPersonTypeEnum());
+			AppUser appUser = null;
+			if (paymentPerson instanceof AppUser) {
+				appUser = (AppUser) paymentPerson;
+			}else if (paymentPerson instanceof UserContact) {
+				appUser = ((UserContact) paymentPerson).getAppUserContact();
+			}
+			if (appUser != null) {
+				messagingService.createInternalDataInvoiceDeletedMessage(appUser, invoice);
+			}
+		}
+
 		BigDecimal costPaidOld = costDistributionItem.getCostPaid() != null ? costDistributionItem.getCostPaid() : new BigDecimal(0);
 
 		billingService.refreshBillingsIfNecessary(costDistributionItem, 0D, costPaidOld.doubleValue());
 
-		Invoice invoice = costDistributionItem.getInvoice();
 		invoice.setLastModifiedAt(new Date());
 		invoiceRepository.save(invoice);
 		costDistributionItemRepository.delete(costDistributionItem);

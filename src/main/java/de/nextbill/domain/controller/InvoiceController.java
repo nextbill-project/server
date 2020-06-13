@@ -24,10 +24,8 @@ import de.nextbill.domain.dtos.*;
 import de.nextbill.domain.enums.CorrectionStatus;
 import de.nextbill.domain.enums.PaymentTypeEnum;
 import de.nextbill.domain.enums.RepetitionTypeEnum;
-import de.nextbill.domain.model.AppUser;
-import de.nextbill.domain.model.CostDistributionItem;
-import de.nextbill.domain.model.Invoice;
-import de.nextbill.domain.model.InvoiceFailure;
+import de.nextbill.domain.interfaces.PaymentPerson;
+import de.nextbill.domain.model.*;
 import de.nextbill.domain.repositories.*;
 import de.nextbill.domain.services.*;
 import de.nextbill.domain.utils.BeanMapper;
@@ -53,16 +51,10 @@ public class InvoiceController {
 	private InvoiceRepository invoiceRepository;
 
 	@Autowired
-	private InvoiceImageRepository invoiceImageRepository;
-
-	@Autowired
 	private InvoiceFailureRepository invoiceFailureRepository;
 
 	@Autowired
 	private AppUserRepository appUserRepository;
-
-	@Autowired
-	private InvoiceCategoryRepository invoiceCategoryRepository;
 
 	@Autowired
 	private InvoiceService invoiceService;
@@ -81,9 +73,6 @@ public class InvoiceController {
 
 	@Autowired
 	private InvoiceHelperService invoiceHelperService;
-
-	@Autowired
-	private BusinessPartnerService businessPartnerService;
 
 	@Autowired
 	private BudgetService budgetService;
