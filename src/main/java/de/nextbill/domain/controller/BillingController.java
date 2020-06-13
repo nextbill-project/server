@@ -24,6 +24,7 @@ import de.nextbill.domain.dtos.*;
 import de.nextbill.domain.enums.BillingStatusEnum;
 import de.nextbill.domain.enums.FirebaseMessageType;
 import de.nextbill.domain.model.*;
+import de.nextbill.domain.pojos.BillingListItem;
 import de.nextbill.domain.repositories.AppUserRepository;
 import de.nextbill.domain.repositories.BillingRepository;
 import de.nextbill.domain.repositories.UserContactRepository;
@@ -261,10 +262,9 @@ public class BillingController {
 		}
 
 		try {
-			File reportFile = pathService.getBillingsPath("Rechnung_" + billing.getBillingId().toString() + ".pdf");
-			if (!reportFile.exists()){
-				reportFile = pathService.getBillingsPath("Rechnung" + billing.getBillingId().toString() + ".pdf");
-			}
+			BillingListItem billingListItem = billingService.startCreateBillingListItem(billing);
+			File reportFile = billingService.createAndSaveBillingReport(billingListItem, billing);
+
 			InputStream in = null;
 			byte[] bytes;
 
