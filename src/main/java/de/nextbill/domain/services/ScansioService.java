@@ -677,6 +677,19 @@ public class ScansioService {
         if (invoiceCategory != null){
             foundInvoice.setInvoiceCategory(invoiceCategory);
             autoFillHelperService.generateCostDistributionForCategory(foundInvoice, createdByUser, invoiceCategory);
+
+            if (invoiceCategory.getInvoiceCategoryName().contains("Geldanlage")) {
+                Optional<RecognitionItemResponseV1> businessPartner = sioInvoiceResponse.getItemResults().stream().filter(t -> t.getIdentificationCode().equals("ORIGIN_BUSINESS_PARTNER")).findFirst();
+                if (businessPartner.isPresent()) {
+                    if (ItemWorkflowStatus.HIT_FOUND.equals(businessPartner.get().getItemWorkflowStatus())){
+                        String businessPartnerName = (String) businessPartner.get().getResultValue();
+
+                        resultBusinessPartner = businessPartnerService.findOrCreateBusinessPartner(businessPartnerName, foundInvoice.getCreatedBy());
+                        foundInvoice.setPaymentRecipientId(resultBusinessPartner.getBusinessPartnerId());
+                        foundInvoice.setPaymentRecipientTypeEnum(PaymentPersonTypeEnum.BUSINESS_PARTNER);
+                    }
+                }
+            }
         }else{
             autoFillHelperService.refreshMoneyValues(foundInvoice);
         }
