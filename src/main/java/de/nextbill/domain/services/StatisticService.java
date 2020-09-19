@@ -445,7 +445,7 @@ public class StatisticService {
             for (CostDistributionItem repetitionNormalCostDistributionItem : repetitionNormalCostDistributionItems) {
                 Invoice invoiceTemplate = invoiceRepository.invoiceTemplateForStandingOrderInvoice(repetitionNormalCostDistributionItem.getInvoice());
 
-                if (!invoiceTemplates.contains(invoiceTemplate)){
+                if (!invoiceTemplates.stream().map(Invoice::getInvoiceId).map(UUID::toString).collect(Collectors.toList()).contains(invoiceTemplate.getInvoiceId().toString())){
                     BigDecimal averageMonthCosts = repetitionNormalCostDistributionItem.getMoneyValue().divide(new BigDecimal(repetitionTypeEnum.getCounterMonths()), RoundingMode.HALF_EVEN);
                     repetitionTypesNormalItemsSumList.add(averageMonthCosts);
                 }

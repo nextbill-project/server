@@ -143,6 +143,7 @@ public class SearchService {
         whereClause = buildQuery(whereClause, currentUser, userContactIds, incomeMainFunctionEnum, expenseMainFunctionEnum, paymentTypeEnum, standingOrder, payerPerson, paymentRecipientPerson, costPayers, isSpecialType, repetitionTypeEnum, invoiceCategories, startDate, endDate, allInvoiceIdsForUserInput, useEqualDate, remarks, fullText);
 //
         jpaQuery.where(whereClause);
+
         List<CostDistributionItem> costDistributionItems = jpaQuery.list(costDistributionItem);
 
         Set<UUID> distinctInvoices = new HashSet<>();
@@ -207,6 +208,50 @@ public class SearchService {
         }
 
         return invoiceCostDistributionItems;
+    }
+
+    public Date searchForNewestDate(boolean distinctInvoices, SearchDTO searchDTO, List<UUID> validInvoiceIds, Date startDateTmp){
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+
+        String loggedInUserName = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        List<UUID> invoiceCategories = new ArrayList<>();
+        if (searchDTO.getInvoiceCategoryDTOs() != null && !searchDTO.getInvoiceCategoryDTOs().isEmpty() ){
+            invoiceCategories.addAll(searchDTO.getInvoiceCategoryDTOs());
+        }else if (searchDTO.getInvoiceCategoryDTO() != null){
+            invoiceCategories.add(searchDTO.getInvoiceCategoryDTO().getInvoiceCategoryId());
+        }
+
+        List<UUID> costPayers = new ArrayList<>();
+        if (searchDTO.getCostPayers() != null && !searchDTO.getCostPayers().isEmpty() ){
+            costPayers.addAll(searchDTO.getCostPayers());
+        }else if (searchDTO.getCostPayer() != null){
+            costPayers.add(searchDTO.getCostPayer().getPayerId());
+        }
+
+        return searchForNewestDate(searchDTO.getIncomeMainFunctionEnum(), searchDTO.getExpenseMainFunctionEnum(), searchDTO.getPaymentTypeEnum(), searchDTO.getStandingOrder(), distinctInvoices,searchDTO.getPayerPerson(),searchDTO.getPaymentRecipientPerson(), costPayers, searchDTO.getSpecialType(),searchDTO.getRepetitionTypeEnum(), invoiceCategories,searchDTO.getStartDate(), searchDTO.getEndDate(), booleanBuilder, loggedInUserName, validInvoiceIds, true, searchDTO.getRemarks(), searchDTO.getFullText(), startDateTmp);
+    }
+
+    public Date searchForNewestDate(Boolean incomeMainFunctionEnum, Boolean expenseMainFunctionEnum, PaymentTypeEnum paymentTypeEnum, Boolean standingOrder, boolean distinctInvoice, PaymentPerson payerPerson, PaymentPerson paymentRecipientPerson, List<UUID> costPayers, Boolean isSpecialType, RepetitionTypeEnum repetitionTypeEnum,
+                                                    List<UUID> invoiceCategories, Date startDate, Date endDate, BooleanBuilder whereClause, String loggedInUserName, List<UUID> allInvoiceIdsForUser, boolean useEqualDate, String remarks, String fullText, Date startDateTmp){
+        AppUser currentUser = appUserRepository.findOneByAppUserId(UUID.fromString(loggedInUserName));
+
+        List<UUID> userContactIds = userContactRepository.findAllByAppUserContactAndBasicStatusEnum(currentUser, BasicStatusEnum.OK).stream().map(UserContact::getUserContactId).collect(Collectors.toList());
+
+        whereClause = buildQuery(whereClause, currentUser, userContactIds, incomeMainFunctionEnum, expenseMainFunctionEnum, paymentTypeEnum, standingOrder, payerPerson, paymentRecipientPerson, costPayers, isSpecialType, repetitionTypeEnum, invoiceCategories, startDate, endDate, allInvoiceIdsForUser, useEqualDate, remarks, fullText);
+
+        if (startDateTmp != null) {
+            BooleanExpression booleanExpression2 = invoice.dateOfInvoice.before(startDateTmp);
+            whereClause.and(booleanExpression2);
+        }
+
+        JPAQuery jpaQueryFactory2 = new JPAQuery(entityManager);
+        JPAQueryBase jpaQuery2 = jpaQueryFactory2.from(costDistributionItem, invoice, appUser);
+
+        jpaQuery2.where(whereClause);
+        Date resultInvoice = (Date) jpaQuery2.singleResult(invoice.dateOfInvoice.max());
+
+        return resultInvoice;
     }
 
     public List<UUID> allInvoicesForUser(AppUser currentUser, Date startDate, Date endDate){
@@ -435,18 +480,19 @@ public class SearchService {
             }else{
 
                 List<UUID> allReadyListInvoiceIds = invoiceRepository.findAllIdsForReadyList(currentUser.getAppUserId().toString(), userContactIds);
-                List<UUID> allFoundInvoices = invoicesInInvoiceCostDistributionItems(search(true, searchDTO, allReadyListInvoiceIds)).stream().map(Invoice::getInvoiceId).collect(Collectors.toList());
 
-                Date newestDate = (Date) invoiceRepository.findNewestDateForReadyList(currentUser.getAppUserId().toString(), userContactIds, allFoundInvoices);
+                Date newestDate = searchForNewestDate(true, searchDTO, allReadyListInvoiceIds, null);
 
                 Integer currentAmountMonths = pageNumber.orElse(0);
-                Integer amountMonth = pageNumber.orElse(0);
-                for (int i = 0; i < amountMonth; i++) {
-                    currentAmountMonths = i+1;
+                if (newestDate != null) {
+                    Integer amountMonth = pageNumber.orElse(0);
+                    for (int i = 0; i < amountMonth; i++) {
+                        currentAmountMonths = i+1;
 
-                    if (newestDate != null) {
-                        Date endOfMonthOfNewestDate = firstDayOfMonth(newestDate);
-                        newestDate = invoiceRepository.findNewestDateForReadyList(currentUser.getAppUserId().toString(), userContactIds, endOfMonthOfNewestDate, allFoundInvoices);
+                        if (newestDate != null) {
+                            Date endOfMonthOfNewestDate = firstDayOfMonth(newestDate);
+                            newestDate = searchForNewestDate(true, searchDTO, allReadyListInvoiceIds, endOfMonthOfNewestDate);
+                        }
                     }
                 }
 
