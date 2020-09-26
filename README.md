@@ -1,3 +1,5 @@
+![build](https://github.com/nextbill-project/server/workflows/build/badge.svg)
+
 # NextBill Server
 
 **The easy way to split and manage invoices**
