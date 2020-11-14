@@ -98,6 +98,8 @@ public class AuthorizationConfigurer extends AuthorizationServerConfigurerAdapte
                 .withClient("nextbillMobileClient")
                 .secret(passwordEncoder.encode(settings.getClientSecret()))
                 .authorizedGrantTypes("refresh_token", "password")
+                .accessTokenValiditySeconds(864000)
+                .refreshTokenValiditySeconds(864000)
                 .autoApprove(true)
                 .scopes("openid");
     }

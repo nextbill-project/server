@@ -42,6 +42,7 @@
 				disabled: '<disabled',
 				currentSelection: '=msCurrentSelection',
 				hideBusinessPartners: '=msHideBusinessPartners',
+				hideCurrentUser: '=msHideCurrentUser',
                 hideSelectionButton: '=msHideSelectionButton',
 				hiddenSelButtonActivator: '=msHiddenSelButtonActivator'
 			},
@@ -58,10 +59,10 @@
 		}
 	}
 
-	PaymentpersonSelectController.$inject = ['$filter','$log','$timeout','UsercontactService','BusinesspartnerService', '_'];
+	PaymentpersonSelectController.$inject = ['$filter','$log','$timeout','UsercontactService','BusinesspartnerService', 'UserService', '_'];
 
 	/* @ngInject */
-	function PaymentpersonSelectController($filter,$log,$timeout,UsercontactService, BusinesspartnerService, _) {
+	function PaymentpersonSelectController($filter,$log,$timeout,UsercontactService, BusinesspartnerService, UserService, _) {
 		var vm = this;
 
 		vm.showDialog = false;
@@ -69,12 +70,31 @@
 		vm.businessPartnerTimeoutRunning = false;
 		vm.appUserTimeoutRunning = false;
 
+		vm.currentUserId = null;
+		UserService.currentUser().then(function(result) {
+			vm.currentUserId = result.appUserId;
+		});
+
         vm.getUsers = function(){
+        	var appUsers= [];
+
             if (vm.appUsers == undefined || vm.appUsers == null){
-                return UsercontactService.getUsers();
+				UsercontactService.getUsers().forEach(function(appUser){
+					appUsers.push(appUser);
+				});
             }else{
-				return vm.appUsers;
+				appUsers = vm.appUsers;
 			}
+
+			if (vm.hideCurrentUser != undefined && vm.hideCurrentUser != null) {
+				var foundAppUser = _.filter(appUsers, function(appUser){ return (appUser.appUserId === vm.currentUserId && appUser.appUserContactId === undefined)});
+				if (foundAppUser != null && foundAppUser != undefined && foundAppUser.length > 0){
+					var foundAppUserIndex = _.indexOf(appUsers, foundAppUser[0]);
+					appUsers.splice(foundAppUserIndex, 1);
+				}
+			}
+
+			return appUsers;
         };
 
 		vm.getNewBusinessPartnerName = function(){

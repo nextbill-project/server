@@ -687,6 +687,13 @@ public class ScansioService {
                         resultBusinessPartner = businessPartnerService.findOrCreateBusinessPartner(businessPartnerName, foundInvoice.getCreatedBy());
                         foundInvoice.setPaymentRecipientId(resultBusinessPartner.getBusinessPartnerId());
                         foundInvoice.setPaymentRecipientTypeEnum(PaymentPersonTypeEnum.BUSINESS_PARTNER);
+
+                        InvoiceCategory invoiceCategoryRenewed = autoFillHelperService.findCategoryForBusinessPartner(createdByUser, resultBusinessPartner, foundInvoice, null, true);
+
+                        if (invoiceCategoryRenewed != null){
+                            foundInvoice.setInvoiceCategory(invoiceCategoryRenewed);
+                            autoFillHelperService.generateCostDistributionForCategory(foundInvoice, createdByUser, invoiceCategoryRenewed);
+                        }
                     }
                 }
             }
