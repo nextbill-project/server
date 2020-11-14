@@ -69,6 +69,11 @@ public class CostDistributionItemRepositoryImpl implements CostDistributionItemR
             andPredicates = builder.and(andPredicates, invoicePayerIsPred);
             Predicate invoicePayerTypeIsPred = builder.equal(costDistributionItemRoot.join("invoice").get("paymentRecipientTypeEnum"), invoicePaymentPersonTypeEnum);
             andPredicates = builder.and(andPredicates, invoicePayerTypeIsPred);
+
+            Predicate payerIdAndPaymentRecipientIdEqualPred = builder.equal(costDistributionItemRoot.join("invoice").get("payerId"), costDistributionItemRoot.join("invoice").get("paymentRecipientId"));
+            Predicate createdByPred = builder.equal(costDistributionItemRoot.join("invoice").get("createdBy"), invoicePayerId.toString());
+            Predicate isExpensePred = builder.not(builder.and(createdByPred, payerIdAndPaymentRecipientIdEqualPred));
+            andPredicates = builder.and(andPredicates, isExpensePred);
         }
 
         Predicate invoiceStatusEnumPred = builder.equal(costDistributionItemRoot.join("invoice").get("invoiceStatusEnum"), invoiceStatusEnum);
