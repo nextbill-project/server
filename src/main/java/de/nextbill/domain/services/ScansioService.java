@@ -36,6 +36,7 @@ import de.nextbill.domain.pojos.scansio.resultData.ExternalOcrResultDataItem;
 import de.nextbill.domain.pojos.scansio.resultData.OcrHit;
 import de.nextbill.domain.repositories.*;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -93,7 +94,7 @@ public class ScansioService {
     private InvoiceCategoryKeywordRepository invoiceCategoryKeywordRepository;
 
     @Value("${external.service.scansio.url}")
-    private String scanioUrl;
+    private String scansioUrl;
 
     @Autowired
     private InvoiceRepository invoiceRepository;
@@ -121,7 +122,7 @@ public class ScansioService {
 
     public RecognitionResponseV1 sendTextToScansio(Invoice invoice, String html) {
 
-        URI uri = UriComponentsBuilder.fromHttpUrl(scanioUrl + "text")
+        URI uri = UriComponentsBuilder.fromHttpUrl(scansioUrl + "text")
                 .queryParam("id", invoice.getInvoiceId().toString())
                 .queryParam("createImage", true)
                 .queryParam("async", false)
@@ -152,7 +153,7 @@ public class ScansioService {
         sioHtmlRequest.setConfigurationName("invoice");
         sioHtmlRequest.setHtml(html);
 
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(scanioUrl + "html")
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(scansioUrl + "html")
                 .queryParam("id", invoice.getInvoiceId().toString())
                 .queryParam("createImage", true);
 
@@ -182,10 +183,10 @@ public class ScansioService {
 
         RecognitionResponseV1 response = sendDataOrImageToScansioForCategory(invoice, externalScanConfiguration);
 
-        if (response != null && !response.getItemResults().isEmpty()){
-            RecognitionItemResponseV1 category = response.getItemResults().get(0);
-            if (ItemWorkflowStatus.HIT_FOUND.equals(category.getItemWorkflowStatus()) && category.getResultValue() != null){
-                UUID categoryId = UUID.fromString((String) category.getResultValue());
+        if (response != null && !response.getResults().isEmpty()){
+            RecognitionItemResponseV1 category = response.getResults().get(0);
+            if (ItemWorkflowStatus.HIT_FOUND.equals(category.getItemWorkflowStatus()) && category.getValue() != null){
+                UUID categoryId = UUID.fromString((String) category.getValue());
 
                 InvoiceCategory invoiceCategory = invoiceCategoryRepository.findById(categoryId).orElse(null);
                 log.info("InvoiceCategory found from Invoice Image: " + invoiceCategory.getInvoiceCategoryName());
@@ -221,12 +222,12 @@ public class ScansioService {
     }
 
     public RecognitionResponseV1 sendImageForInvoiceToScansio(Invoice invoice, boolean rotate) throws IOException {
-        return sendImageToScansio(invoice, rotate, RecognitionResponseV1.class, "invoice", false);
+        return sendImageToScansio(invoice, rotate, RecognitionResponseV1.class, "scansioInvoiceConfiguration", false);
     }
 
     private <T> T sendImageToScansio(Invoice invoice, boolean rotate, Class<T> responseClass, String configurationName, boolean async) throws IOException {
 
-        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(scanioUrl + "image/body")
+        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(scansioUrl + "file/body")
                 .queryParam("id", invoice.getInvoiceId().toString())
                 .queryParam("rotate", rotate)
                 .queryParam("returnDataResults", true)
@@ -291,7 +292,7 @@ public class ScansioService {
                 sioFileRequest.setFile(new String(Base64.encodeBase64(Files.readAllBytes(file.toPath())), StandardCharsets.UTF_8));
                 sioFileRequest.setConfiguration(configuration);
 
-                URI uri = UriComponentsBuilder.fromHttpUrl(scanioUrl + "image/json")
+                URI uri = UriComponentsBuilder.fromHttpUrl(scansioUrl + "/file")
                         .queryParam("id", invoice.getInvoiceId().toString())
                         .queryParam("async", false)
                         .queryParam("returnDataResults", true)
@@ -305,7 +306,7 @@ public class ScansioService {
                 sioDataRequest.setConfiguration(configuration);
                 sioDataRequest.setResultData(invoice.getScansioResultData());
 
-                URI uri = UriComponentsBuilder.fromHttpUrl(scanioUrl + "data")
+                URI uri = UriComponentsBuilder.fromHttpUrl(scansioUrl + "data")
                         .queryParam("id", invoice.getInvoiceId().toString())
                         .queryParam("async", false)
                         .build().encode().toUri();
@@ -403,7 +404,7 @@ public class ScansioService {
                 sioFileRequest.setFile(new String(Base64.encodeBase64(Files.readAllBytes(file.toPath())), StandardCharsets.UTF_8));
                 sioFileRequest.setChanges(changes);
 
-                URI uri = UriComponentsBuilder.fromHttpUrl(scanioUrl + "image/json")
+                URI uri = UriComponentsBuilder.fromHttpUrl(scansioUrl + "file")
                         .queryParam("id", invoice.getInvoiceId().toString())
                         .queryParam("async", false)
                         .queryParam("returnDataResults", true)
@@ -418,7 +419,7 @@ public class ScansioService {
                 sioDataRequest.setResultData(invoice.getScansioResultData());
                 sioDataRequest.setChanges(changes);
 
-                URI uri = UriComponentsBuilder.fromHttpUrl(scanioUrl + "data")
+                URI uri = UriComponentsBuilder.fromHttpUrl(scansioUrl + "data")
                         .queryParam("id", invoice.getInvoiceId().toString())
                         .queryParam("async", false)
                         .build().encode().toUri();
@@ -440,21 +441,21 @@ public class ScansioService {
 
             List<RecognitionItemResponseV1> itemsForRectangle = new ArrayList<>();
 
-            Optional<RecognitionItemResponseV1> article = sioInvoiceLineResponse.getItemResults().stream().filter(t -> t.getIdentificationCode().equals("ARTICLE")).findFirst();
+            Optional<RecognitionItemResponseV1> article = sioInvoiceLineResponse.getResults().stream().filter(t -> t.getIdentificationCode().equals("ARTICLE")).findFirst();
             if (article.isPresent() && ItemWorkflowStatus.HIT_FOUND.equals(article.get().getItemWorkflowStatus())){
-                articleDTO.setName((String) article.get().getResultValue());
+                articleDTO.setName((String) article.get().getValue());
                 itemsForRectangle.add(article.get());
             }else{
                 return null;
             }
 
-            Optional<RecognitionItemResponseV1> sumValue = sioInvoiceLineResponse.getItemResults().stream().filter(t -> t.getIdentificationCode().equals("SUM_VALUE")).findFirst();
-            Optional<RecognitionItemResponseV1> sumValueAlternative = sioInvoiceLineResponse.getItemResults().stream().filter(t -> t.getIdentificationCode().equals("SUM_VALUE_ALTERNATIVE")).findFirst();
+            Optional<RecognitionItemResponseV1> sumValue = sioInvoiceLineResponse.getResults().stream().filter(t -> t.getIdentificationCode().equals("SUM_VALUE")).findFirst();
+            Optional<RecognitionItemResponseV1> sumValueAlternative = sioInvoiceLineResponse.getResults().stream().filter(t -> t.getIdentificationCode().equals("SUM_VALUE_ALTERNATIVE")).findFirst();
             if (sumValue.isPresent() && ItemWorkflowStatus.HIT_FOUND.equals(sumValue.get().getItemWorkflowStatus())) {
-                articleDTO.setPrice(new BigDecimal(sumValue.get().getResultValue() instanceof Double ? (Double) sumValue.get().getResultValue() : (Long) sumValue.get().getResultValue()).setScale(2, RoundingMode.HALF_EVEN));
+                articleDTO.setPrice(new BigDecimal(sumValue.get().getValue() instanceof Double ? (Double) sumValue.get().getValue() : (Long) sumValue.get().getValue()).setScale(2, RoundingMode.HALF_EVEN));
                 itemsForRectangle.add(sumValue.get());
             }else if (sumValueAlternative.isPresent() && ItemWorkflowStatus.HIT_FOUND.equals(sumValueAlternative.get().getItemWorkflowStatus())){
-                articleDTO.setPrice(new BigDecimal(sumValueAlternative.get().getResultValue() instanceof Double ? (Double) sumValueAlternative.get().getResultValue() : (Long) sumValueAlternative.get().getResultValue()).setScale(2, RoundingMode.HALF_EVEN));
+                articleDTO.setPrice(new BigDecimal(sumValueAlternative.get().getValue() instanceof Double ? (Double) sumValueAlternative.get().getValue() : (Long) sumValueAlternative.get().getValue()).setScale(2, RoundingMode.HALF_EVEN));
                 itemsForRectangle.add(sumValueAlternative.get());
             }
 
@@ -524,17 +525,17 @@ public class ScansioService {
         BigDecimal highestEndX = new BigDecimal(0);
 
         for (RecognitionItemResponseV1 item : items) {
-            if (item.getStartX().compareTo(lowestStartX) <= 0){
-                lowestStartX = item.getStartX();
+            if (item.getRawStartX().compareTo(lowestStartX) <= 0){
+                lowestStartX = item.getRawStartX();
             }
-            if (item.getStartY().compareTo(lowestStartY) <= 0){
-                lowestStartY = item.getStartY();
+            if (item.getRawStartY().compareTo(lowestStartY) <= 0){
+                lowestStartY = item.getRawStartY();
             }
-            if (item.getEndX().compareTo(highestEndX) >= 0){
-                highestEndX = item.getEndX();
+            if (item.getRawEndX().compareTo(highestEndX) >= 0){
+                highestEndX = item.getRawEndX();
             }
-            if (item.getEndY().compareTo(highestEndY) >= 0){
-                highestEndY = item.getEndY();
+            if (item.getRawEndY().compareTo(highestEndY) >= 0){
+                highestEndY = item.getRawEndY();
             }
         }
 
@@ -558,7 +559,7 @@ public class ScansioService {
                 SioFileRequest sioFileRequest = new SioFileRequest();
                 sioFileRequest.setFile(new String(Base64.encodeBase64(Files.readAllBytes(file.toPath())), StandardCharsets.UTF_8));
 
-                URI uri = UriComponentsBuilder.fromHttpUrl(scanioUrl + "image/json")
+                URI uri = UriComponentsBuilder.fromHttpUrl(scansioUrl + "file")
                         .queryParam("id", invoice.getInvoiceId().toString())
                         .queryParam("async", false)
                         .queryParam("returnDataResults", true)
@@ -625,29 +626,30 @@ public class ScansioService {
         BusinessPartner resultBusinessPartner = null;
         try{
             foundInvoice.setDateOfInvoice(new Date());
-            Optional<RecognitionItemResponseV1> dateOfInvoice = sioInvoiceResponse.getItemResults().stream().filter(t -> t.getIdentificationCode().equals("DATE_OF_INVOICE")).findFirst();
+            Optional<RecognitionItemResponseV1> dateOfInvoice = sioInvoiceResponse.getResults().stream().filter(t -> t.getIdentificationCode().equals("DATE_OF_INVOICE")).findFirst();
             if (dateOfInvoice.isPresent()){
                 if (ItemWorkflowStatus.HIT_FOUND.equals(dateOfInvoice.get().getItemWorkflowStatus())){
-                    foundInvoice.setDateOfInvoice(new Date((Long) dateOfInvoice.get().getResultValue()));
+                    SimpleDateFormat tmpSdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+                    foundInvoice.setDateOfInvoice(tmpSdf.parse((String) dateOfInvoice.get().getValue()));
                 } else if (ItemWorkflowStatus.ERROR.equals(dateOfInvoice.get().getItemWorkflowStatus())){
                     hasError = true;
                 }
             }
 
             foundInvoice.setSumOfInvoice(new BigDecimal(0.0).setScale(2, RoundingMode.HALF_EVEN));
-            Optional<RecognitionItemResponseV1> sumValue = sioInvoiceResponse.getItemResults().stream().filter(t -> t.getIdentificationCode().equals("SUM_VALUE")).findFirst();
+            Optional<RecognitionItemResponseV1> sumValue = sioInvoiceResponse.getResults().stream().filter(t -> t.getIdentificationCode().equals("SUM_VALUE")).findFirst();
             if (sumValue.isPresent()){
                 if (ItemWorkflowStatus.HIT_FOUND.equals(sumValue.get().getItemWorkflowStatus())){
-                    foundInvoice.setSumOfInvoice(new BigDecimal((Double) sumValue.get().getResultValue()).setScale(2, RoundingMode.HALF_EVEN));
+                    foundInvoice.setSumOfInvoice(new BigDecimal((String) sumValue.get().getValue()).setScale(2, RoundingMode.HALF_EVEN));
                 } else if (ItemWorkflowStatus.ERROR.equals(sumValue.get().getItemWorkflowStatus())){
                     hasError = true;
                 }
             }
 
-            Optional<RecognitionItemResponseV1> businessPartner = sioInvoiceResponse.getItemResults().stream().filter(t -> t.getIdentificationCode().equals("BUSINESS_PARTNER")).findFirst();
+            Optional<RecognitionItemResponseV1> businessPartner = sioInvoiceResponse.getResults().stream().filter(t -> t.getIdentificationCode().equals("BUSINESS_PARTNER")).findFirst();
             if (businessPartner.isPresent()) {
                 if (ItemWorkflowStatus.HIT_FOUND.equals(businessPartner.get().getItemWorkflowStatus())){
-                    String businessPartnerName = (String) businessPartner.get().getResultValue();
+                    String businessPartnerName = (String) businessPartner.get().getValue();
 
                     resultBusinessPartner = businessPartnerService.findOrCreateBusinessPartner(businessPartnerName, foundInvoice.getCreatedBy());
                     foundInvoice.setPaymentRecipientId(resultBusinessPartner.getBusinessPartnerId());
@@ -657,6 +659,7 @@ public class ScansioService {
                 }
             }
         }catch(Exception e){
+            e.printStackTrace();
             hasError = true;
             foundInvoice.setSumOfInvoice(new BigDecimal(0.0).setScale(2, RoundingMode.HALF_EVEN));
             foundInvoice.setDateOfInvoice(new Date());
@@ -679,10 +682,10 @@ public class ScansioService {
             autoFillHelperService.generateCostDistributionForCategory(foundInvoice, createdByUser, invoiceCategory);
 
             if (invoiceCategory.getInvoiceCategoryName().contains("Geldanlage")) {
-                Optional<RecognitionItemResponseV1> businessPartner = sioInvoiceResponse.getItemResults().stream().filter(t -> t.getIdentificationCode().equals("ORIGIN_BUSINESS_PARTNER")).findFirst();
+                Optional<RecognitionItemResponseV1> businessPartner = sioInvoiceResponse.getResults().stream().filter(t -> t.getIdentificationCode().equals("ORIGIN_BUSINESS_PARTNER")).findFirst();
                 if (businessPartner.isPresent()) {
                     if (ItemWorkflowStatus.HIT_FOUND.equals(businessPartner.get().getItemWorkflowStatus())){
-                        String businessPartnerName = (String) businessPartner.get().getResultValue();
+                        String businessPartnerName = (String) businessPartner.get().getValue();
 
                         resultBusinessPartner = businessPartnerService.findOrCreateBusinessPartner(businessPartnerName, foundInvoice.getCreatedBy());
                         foundInvoice.setPaymentRecipientId(resultBusinessPartner.getBusinessPartnerId());
