@@ -202,7 +202,7 @@ public class ImageConversionService {
 			java.nio.file.Files.copy(Paths.get(tempFile.getAbsolutePath()), Paths.get( originalFile.getAbsolutePath() ));
 
 			BufferedImage bufferedImage = ImageIO.read(originalFile);
-			bufferedImage = rescaleImage(bufferedImage, 1400);
+			bufferedImage = rescaleImage(bufferedImage, 2000);
 
 			if (rotate){
 				bufferedImage = recognizeAndRotateImage(savedInvoice.getInvoiceSource(), originalFile, bufferedImage);
@@ -210,6 +210,7 @@ public class ImageConversionService {
 			}
 
 			ImageIO.write(bufferedImage, "jpg", thumbnailFile);
+			ImageIO.write(bufferedImage, "jpg", originalFile);
 
 			invoiceImage.setFileName(jpgThumbnailFilename);
 			invoiceImage.setFileNameOriginal(newFilename);
@@ -327,16 +328,20 @@ public class ImageConversionService {
 		Integer width = inputBufferedImage.getWidth();
 		Integer height = inputBufferedImage.getHeight();
 
+		boolean autoImageRotationOk = true;
 		if (directory != null) {
 			try {
 				orientation = directory.getInt(ExifIFD0Directory.TAG_ORIENTATION);
 			} catch (MetadataException me) {
+				autoImageRotationOk = false;
 				log.warn("Could not get orientation");
 			}
 		}
 
-		if (directory == null && height < width) {
-			return Scalr.rotate(inputBufferedImage, Scalr.Rotation.CW_90);
+		if (directory == null || !autoImageRotationOk) {
+			if (InvoiceSource.CAMERA.equals(invoiceSource) && height < width) {
+                return Scalr.rotate(inputBufferedImage, Scalr.Rotation.CW_90);
+			}
 		}
 
 		AffineTransform t = new AffineTransform();
