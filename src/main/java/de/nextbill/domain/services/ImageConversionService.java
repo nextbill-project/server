@@ -327,20 +327,16 @@ public class ImageConversionService {
 		Integer width = inputBufferedImage.getWidth();
 		Integer height = inputBufferedImage.getHeight();
 
-		boolean autoImageRotationOk = true;
 		if (directory != null) {
 			try {
 				orientation = directory.getInt(ExifIFD0Directory.TAG_ORIENTATION);
 			} catch (MetadataException me) {
-				autoImageRotationOk = false;
 				log.warn("Could not get orientation");
 			}
 		}
 
-		if (directory == null || !autoImageRotationOk) {
-			if (InvoiceSource.CAMERA.equals(invoiceSource) && height < width) {
-                return Scalr.rotate(inputBufferedImage, Scalr.Rotation.CW_90);
-			}
+		if (directory == null && height < width) {
+			return Scalr.rotate(inputBufferedImage, Scalr.Rotation.CW_90);
 		}
 
 		AffineTransform t = new AffineTransform();
