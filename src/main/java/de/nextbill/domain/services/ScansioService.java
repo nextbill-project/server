@@ -129,7 +129,7 @@ public class ScansioService {
                 .build().encode().toUri();
 
         SioTextRequest sioTextRequest = new SioTextRequest();
-        sioTextRequest.setConfigurationName("invoiceMic");
+        sioTextRequest.setConfigurationName("scansioInvoiceTextConfiguration");
         sioTextRequest.setText(html);
 
         try{
@@ -150,7 +150,7 @@ public class ScansioService {
     public RecognitionResponseV1 sendHtmlToScansioForInvoice(Invoice invoice, String html) throws IOException {
 
         SioHtmlRequest sioHtmlRequest = new SioHtmlRequest();
-        sioHtmlRequest.setConfigurationName("invoice");
+        sioHtmlRequest.setConfigurationName("scansioInvoiceConfiguration");
         sioHtmlRequest.setHtml(html);
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(scansioUrl + "html")
@@ -400,7 +400,7 @@ public class ScansioService {
                 }
 
                 SioFileRequest sioFileRequest = new SioFileRequest();
-                sioFileRequest.setConfigurationName("article");
+                sioFileRequest.setConfigurationName("scansioArticleConfiguration");
                 sioFileRequest.setFile(new String(Base64.encodeBase64(Files.readAllBytes(file.toPath())), StandardCharsets.UTF_8));
                 sioFileRequest.setChanges(changes);
 
@@ -415,7 +415,7 @@ public class ScansioService {
                 sioInvoiceLineResponse = sioInvoiceLineResponseEntity.getBody();
             }else {
                 SioDataRequest sioDataRequest = new SioDataRequest();
-                sioDataRequest.setConfigurationName("article");
+                sioDataRequest.setConfigurationName("scansioArticleConfiguration");
                 sioDataRequest.setResultData(invoice.getScansioResultData());
                 sioDataRequest.setChanges(changes);
 
