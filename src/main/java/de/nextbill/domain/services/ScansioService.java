@@ -450,13 +450,9 @@ public class ScansioService {
             }
 
             Optional<RecognitionItemResponseV1> sumValue = sioInvoiceLineResponse.getResults().stream().filter(t -> t.getIdentificationCode().equals("SUM_VALUE")).findFirst();
-            Optional<RecognitionItemResponseV1> sumValueAlternative = sioInvoiceLineResponse.getResults().stream().filter(t -> t.getIdentificationCode().equals("SUM_VALUE_ALTERNATIVE")).findFirst();
             if (sumValue.isPresent() && ItemWorkflowStatus.HIT_FOUND.equals(sumValue.get().getItemWorkflowStatus())) {
-                articleDTO.setPrice(new BigDecimal(sumValue.get().getValue() instanceof Double ? (Double) sumValue.get().getValue() : (Long) sumValue.get().getValue()).setScale(2, RoundingMode.HALF_EVEN));
+                articleDTO.setPrice(new BigDecimal(sumValue.get().getValue()).setScale(2, RoundingMode.HALF_EVEN));
                 itemsForRectangle.add(sumValue.get());
-            }else if (sumValueAlternative.isPresent() && ItemWorkflowStatus.HIT_FOUND.equals(sumValueAlternative.get().getItemWorkflowStatus())){
-                articleDTO.setPrice(new BigDecimal(sumValueAlternative.get().getValue() instanceof Double ? (Double) sumValueAlternative.get().getValue() : (Long) sumValueAlternative.get().getValue()).setScale(2, RoundingMode.HALF_EVEN));
-                itemsForRectangle.add(sumValueAlternative.get());
             }
 
             createOcrRectangleFromItemList(articleDTO, itemsForRectangle);

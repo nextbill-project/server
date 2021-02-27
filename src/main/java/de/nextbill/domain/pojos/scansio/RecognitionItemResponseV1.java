@@ -36,7 +36,7 @@ public class RecognitionItemResponseV1 {
 
     private String classType;
 
-    private Object value;
+    private String value;
 
     private BigDecimal rawStartX;
 
