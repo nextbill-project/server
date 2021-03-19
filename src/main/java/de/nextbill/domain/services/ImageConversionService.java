@@ -202,7 +202,7 @@ public class ImageConversionService {
 			java.nio.file.Files.copy(Paths.get(tempFile.getAbsolutePath()), Paths.get( originalFile.getAbsolutePath() ));
 
 			BufferedImage bufferedImage = ImageIO.read(originalFile);
-			bufferedImage = rescaleImage(bufferedImage, 1400);
+			bufferedImage = rescaleImage(bufferedImage, 2000);
 
 			if (rotate){
 				bufferedImage = recognizeAndRotateImage(savedInvoice.getInvoiceSource(), originalFile, bufferedImage);
@@ -210,6 +210,7 @@ public class ImageConversionService {
 			}
 
 			ImageIO.write(bufferedImage, "jpg", thumbnailFile);
+			ImageIO.write(bufferedImage, "jpg", originalFile);
 
 			invoiceImage.setFileName(jpgThumbnailFilename);
 			invoiceImage.setFileNameOriginal(newFilename);

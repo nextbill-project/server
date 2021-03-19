@@ -36,13 +36,13 @@ public class RecognitionItemResponseV1 {
 
     private String classType;
 
-    private Object resultValue;
+    private String value;
 
-    private BigDecimal startX;
+    private BigDecimal rawStartX;
 
-    private BigDecimal endX;
+    private BigDecimal rawEndX;
 
-    private BigDecimal startY;
+    private BigDecimal rawStartY;
 
-    private BigDecimal endY;
+    private BigDecimal rawEndY;
 }

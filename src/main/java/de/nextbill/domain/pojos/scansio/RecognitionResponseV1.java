@@ -43,5 +43,5 @@ public class RecognitionResponseV1 {
 
     private String configurationName;
 
-    private List<RecognitionItemResponseV1> itemResults;
+    private List<RecognitionItemResponseV1> results;
 }
